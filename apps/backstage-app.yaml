@@ -15,7 +15,7 @@ spec:
       values: |
         backstage:
           image:
-            repository: roadiehq/backstage-showcase
+            repository: backstageapp/backstage
             tag: latest
           extraEnvVars:
             - name: GITHUB_TOKEN
