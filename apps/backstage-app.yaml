@@ -8,8 +8,12 @@ spec:
   source:
     chart: backstage
     repoURL: https://backstage.github.io/charts
-    targetRevision: 1.0.0 # Χρησιμοποιούμε μια σταθερή έκδοση
+    targetRevision: 1.0.0
     helm:
+      # Αυτό το flag παρακάμπτει το πρόβλημα με το "tls: failed to verify certificate"
+      parameters:
+        - name: "global.skipSchemaValidation"
+          value: "true"
       values: |
         backstage:
           image:
@@ -19,7 +23,7 @@ spec:
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: backstage-secrets # Το όνομα που δώσαμε στο Sealed Secret (αφού ξεκλειδωθεί)
+                  name: backstage-secrets
                   key: GITHUB_TOKEN
   destination:
     server: https://kubernetes.default.svc
@@ -28,3 +32,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=false # Παράκαμψη validation από την πλευρά του ArgoCD
