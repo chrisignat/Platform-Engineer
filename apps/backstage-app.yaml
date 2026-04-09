@@ -8,14 +8,13 @@ spec:
   source:
     chart: backstage
     repoURL: https://backstage.github.io/charts
-    targetRevision: "*"
+    targetRevision: "*" # Θα τραβήξει την τελευταία έκδοση που υπάρχει στο repo
     helm:
       skipSchemaValidation: true
       values: |
         backstage:
           image:
-            registry: ghcr.io
-            repository: roadiehq/backstage-showcase
+            repository: backstageapp/backstage
             tag: latest
           extraEnvVars:
             - name: GITHUB_TOKEN
@@ -23,7 +22,10 @@ spec:
                 secretKeyRef:
                   name: backstage-secrets
                   key: GITHUB_TOKEN
-
-        global:
-          imagePullSecrets:
-            - name: ghcr-pull-secret
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
