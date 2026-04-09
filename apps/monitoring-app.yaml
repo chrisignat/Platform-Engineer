@@ -8,13 +8,23 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 57.1.0 # Καρφώνουμε μια σταθερή έκδοση για ασφάλεια
+    targetRevision: 57.1.0
+    helm: # <-- ΕΔΩ ΑΡΧΙΖΟΥΝ ΟΙ ΝΕΕΣ ΡΥΘΜΙΣΕΙΣ
+      values: |
+        kubeControllerManager:
+          enabled: false
+        kubeEtcd:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeProxy:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring # Θα το βάλουμε σε δικό του, ξεχωριστό namespace
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true # Μαγική εντολή: Αν δεν υπάρχει το namespace, φτιάξ'το!
+      - CreateNamespace=true
