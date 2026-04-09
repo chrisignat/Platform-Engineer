@@ -10,10 +10,8 @@ spec:
     repoURL: https://backstage.github.io/charts
     targetRevision: 1.0.0
     helm:
-      # Αυτό το flag παρακάμπτει το πρόβλημα με το "tls: failed to verify certificate"
-      parameters:
-        - name: "global.skipSchemaValidation"
-          value: "true"
+      # Εδώ προσθέτουμε το flag απευθείας στον Helm client
+      skipSchemaValidation: true 
       values: |
         backstage:
           image:
@@ -33,5 +31,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
+      - Validate=false
       - CreateNamespace=true
-      - Validate=false # Παράκαμψη validation από την πλευρά του ArgoCD
