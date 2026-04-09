@@ -17,23 +17,13 @@ spec:
             registry: ghcr.io
             repository: roadiehq/backstage-showcase
             tag: latest
-            pullSecrets:
-              - name: ghcr-pull-secret
+          extraEnvVars:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_TOKEN
 
         global:
           imagePullSecrets:
             - name: ghcr-pull-secret
-
-        extraEnvVars:
-          - name: GITHUB_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: backstage-secrets
-                key: GITHUB_TOKEN
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: default
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
