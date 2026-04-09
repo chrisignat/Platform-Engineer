@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-nginx-app
+  name: my-redis-db
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/NxCreed/Platform-Engineer.git  # <-- Βάλε το repo σου!
-    targetRevision: main
-    path: . # Επειδή τα nginx.yaml / kustomization.yaml είναι στον κεντρικό φάκελο
+    chart: redis
+    repoURL: https://charts.bitnami.com/bitnami # <-- Δεν δείχνει στο repo σου, δείχνει στο public Helm repo της Bitnami!
+    targetRevision: 18.x.x
   destination:
     server: https://kubernetes.default.svc
     namespace: default
