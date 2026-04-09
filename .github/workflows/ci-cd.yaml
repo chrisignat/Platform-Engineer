@@ -22,7 +22,7 @@ jobs:
           
           # Χρησιμοποιούμε το kustomize για να αλλάξουμε το image
           # Αν δεν έχεις kustomize στο runner, μπορούμε να το κάνουμε με sed
-          sed -i "s|image: nginx:.*|image: nginx:$NEW_TAG|g" nginx.yaml
+          sed -i "s/nginx:latest/nginx:$NEW_TAG/g" nginx.yaml
           
       - name: Commit and push changes
         run: |
