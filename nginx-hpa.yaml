@@ -16,4 +16,4 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50 # Αν η CPU ξεπεράσει το 50%, φτιάξε νέο Pod
+        averageUtilization: 10 # Αν η CPU ξεπεράσει το 50%, φτιάξε νέο Pod
