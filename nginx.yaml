@@ -21,10 +21,10 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            cpu: "100m"      # Αυτό χρειάζεται το HPA (0.1 CPU core)
+            cpu: "200m"      # Αυτό χρειάζεται το HPA (0.1 CPU core)
             memory: "64Mi"
           limits:
-            cpu: "200m"      # Το ταβάνι του Pod
+            cpu: "400m"      # Το ταβάνι του Pod
             memory: "128Mi"
 ---
 apiVersion: v1
