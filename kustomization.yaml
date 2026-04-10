@@ -4,7 +4,6 @@ kind: Kustomization
 # Λέμε στο Kustomize ποια είναι τα βασικά μας αρχεία
 resources:
   - nginx.yaml
-  - ingress.yaml
 
 # Εδώ αρχίζει η μαγεία! 
 # Θα προσθέσουμε αυτόματα ένα label σε ΟΛΑ μας τα resources, 
