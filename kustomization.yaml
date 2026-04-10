@@ -6,6 +6,7 @@ resources:
   - nginx.yaml
   - grafana-ingress.yaml
   - argocd-ingress.yaml
+  - nginx-hpa.yaml
 
 # Εδώ αρχίζει η μαγεία! 
 # Θα προσθέσουμε αυτόματα ένα label σε ΟΛΑ μας τα resources, 
