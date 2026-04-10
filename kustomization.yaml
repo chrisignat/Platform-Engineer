@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - nginx.yaml
   - grafana-ingress.yaml
+  - argocd-ingress.yaml
 
 # Εδώ αρχίζει η μαγεία! 
 # Θα προσθέσουμε αυτόματα ένα label σε ΟΛΑ μας τα resources, 
