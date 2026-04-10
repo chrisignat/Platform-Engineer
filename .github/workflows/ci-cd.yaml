@@ -55,5 +55,11 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add nginx.yaml
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update image to latest [skip ci]"
+            git push
+          fi
           git commit -m "chore: security-scan passed, updating image"
           git push
