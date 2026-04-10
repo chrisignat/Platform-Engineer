@@ -7,13 +7,13 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: default
-  name: pod-reader
+  name: pod-reader        # <--- Πρέπει να είναι ΑΚΡΙΒΩΣ το ίδιο
+  namespace: default      # <--- Πρέπει να είναι το ΙΔΙΟ namespace
 spec:
   rules:
-  - apiGroups: [""] # "" υποδηλώνει το core API group
-    resources: ["pods", "pods/log", "services"]
-    verbs: ["get", "watch", "list"] # Μόνο διάβασμα, ΟΧΙ delete, ΟΧΙ create
+  - apiGroups: [""]
+    resources: ["pods", "services", "pods/log"]
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -26,5 +26,5 @@ subjects:
   namespace: default
 roleRef:
   kind: Role
-  name: pod-reader
+  name: pod-reader        # <--- Εδώ το Binding "δένει" με τον παραπάνω Role
   apiGroup: rbac.authorization.k8s.io
