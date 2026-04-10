@@ -1,12 +1,15 @@
-name: CI to Docker Hub
+name: Secure CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ] # Τρέχει κάθε φορά που κάνεις push στη main
+    branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Απαραίτητο για να κάνει το commit στο τέλος
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -17,23 +20,40 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
+      # 1. BUILD ΤΟ IMAGE ΤΟΠΙΚΑ (Χωρίς push ακόμα)
+      - name: Build Docker Image Locally
         uses: docker/build-push-action@v4
         with:
-          context: . # Εδώ υποθέτουμε ότι έχεις ένα Dockerfile στον κεντρικό φάκελο
+          context: .
+          load: true # Το φορτώνει τοπικά στον runner για να το σκανάρει
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:test
+
+      # 2. SECURITY SCAN (Trivy)
+      # Αν βρει "HIGH" ή "CRITICAL" vulnerabilities, το workflow θα αποτύχει εδώ!
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:test'
+          format: 'table'
+          exit-code: '1' # Αν βρει κενά, σταματάει το pipeline (error)
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # 3. PUSH ΤΟ IMAGE (Μόνο αν το scan πέρασε)
+      - name: Push Docker Image to Docker Hub
+        uses: docker/build-push-action@v4
+        with:
+          context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:latest
-          
-# ... (τα προηγούμενα steps του build-and-push)
 
+      # 4. UPDATE K8S MANIFEST (Μόνο αν όλα είναι οκ)
       - name: Update Kubernetes Manifest
         run: |
-          # Εδώ χρησιμοποιούμε το 'sed' για να αλλάξουμε το image tag στο deployment αρχείο σου
-          # Αντικατάστησε το 'nginx-deployment.yaml' με το δικό σου αρχείο
           sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:latest|g" nginx.yaml
-          
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add nginx.yaml
-          git commit -m "chore: update image to latest"
-          git push          
+          git commit -m "chore: security-scan passed, updating image"
+          git push
