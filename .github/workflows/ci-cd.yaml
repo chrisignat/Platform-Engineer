@@ -1,4 +1,4 @@
-name: DevSecOps CI/CD Pipeline
+name: DevSecOps Unified Security Scan
 
 on:
   push:
@@ -8,81 +8,61 @@ jobs:
   security-scan:
     name: Security Analysis
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Απαραίτητο για να γράφει στο Security Tab
+      actions: read
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Απαραίτητο για το Gitleaks
 
-      # 1. Έλεγχος για Secrets (Gitleaks)
-      - name: Gitleaks Scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 2. Στατική Ανάλυση Κώδικα (Semgrep)
+      # 1. Semgrep Scan -> SARIF
       - name: Semgrep SAST
         run: |
-          docker run --rm -v "${{ github.workspace }}:/src" returntocorp/semgrep semgrep scan --config auto
+          docker run --rm -v "${{ github.workspace }}:/src" returntocorp/semgrep \
+          semgrep scan --config auto --sarif --output semgrep.sarif
+        continue-on-error: true # Συνεχίζουμε για να ανέβουν τα αποτελέσματα
 
-      # 3. Έλεγχος Infrastructure as Code (Checkov)
-      # Θα ελέγξει τα nginx.yaml, argocd-ingress.yaml κλπ που ανέβασες
+      # 2. Checkov Scan -> SARIF
       - name: Checkov IaC Scan
         uses: bridgecrewio/checkov-action@master
         with:
           directory: .
           framework: kubernetes
-          soft_fail: true # Μην κόψεις το build ακόμα, απλά δείξε τα λάθη
+          output_format: sarif
+          output_file_path: checkov.sarif
+          soft_fail: true
 
-  build-and-push:
-    name: Build & Push Image
-    needs: security-scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # 4. Build και Scan του Image με Trivy πριν το Push
-      - name: Build Docker Image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }} .
-
-      - name: Trivy Vulnerability Scan
+      # 3. Trivy Scan (για το Dockerfile & Dependencies) -> SARIF
+      - name: Trivy FS Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }}'
-          format: 'table'
-          exit-code: '1' # Κόψε το build αν βρεις σοβαρά κενά (High/Critical)
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          scan-type: 'fs'
+          security-checks: 'vuln,config'
+          format: 'sarif'
+          output: 'trivy.sarif'
+          exit-code: '0'
 
-      - name: Push Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }}
+      # 4. UPLOAD ALL TO GITHUB SECURITY TAB
+      # Εδώ μαζεύουμε όλα τα αποτελέσματα σε ένα σημείο
+      - name: Upload Semgrep Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
 
-  update-manifest:
-    name: Update K8s Manifests
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Upload Checkov Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: checkov.sarif
+          category: checkov
 
-      # 5. Ενημέρωση του Image Tag στο nginx.yaml (GitOps flow)
-      # Το ArgoCD θα δει την αλλαγή στο Git και θα κάνει deploy
-      - name: Update Image Version
-        run: |
-          sed -i "s|image: nxcreed/my-nginx-app:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }}|g" nginx.yaml
-          
-      - name: Commit and Push changes
-        run: |
-          git config --global user.email "devsecops-bot@example.com"
-          git config --global user.name "DevSecOps Bot"
-          git add nginx.yaml
-          git commit -m "Update image to version ${{ github.sha }} [skip ci]"
-          git push
+      - name: Upload Trivy Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy.sarif
+          category: trivy
