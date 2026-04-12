@@ -4,8 +4,6 @@ kind: Kustomization
 # Λέμε στο Kustomize ποια είναι τα βασικά μας αρχεία
 resources:
   - nginx.yaml
-  - grafana-ingress.yaml
-  - argocd-ingress.yaml
   - nginx-hpa.yaml
   - developer-rbac.yaml
 
