@@ -2,11 +2,14 @@ name: Fix Port Scorecard
 on:
   workflow_dispatch:
     inputs:
-      port_payload: # Αυτό που βάλαμε πριν
+      port_payload:
         description: 'Payload from Port'
         required: false
-      port_context: # ΠΡΟΣΘΕΣΕ ΑΥΤΟ ΕΔΩ
+      port_context:
         description: 'Context from Port'
+        required: false
+      file_content: # ΠΡΟΣΘΕΣΕ ΑΥΤΟ ΕΔΩ
+        description: 'The content from Port form'
         required: false
 
 jobs:
@@ -14,25 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Create README
-        run: |
-          echo "# Platform Engineer Project" > README.md
-          echo "This project is managed via Port IDP." >> README.md
-      - name: Commit and Push
-        run: |
-          git config --global user.name "Port-Bot"
-          git config --global user.email "bot@getport.io"
-          git add README.md
-          git commit -m "docs: auto-create readme from Port Action"
-          git push
       - name: Create Custom File
         run: |
-          # Διαβάζουμε το input που έστειλε το Port
-          echo "${{ fromJson(github.event.inputs.port_payload).inputs.file_content }}" > portal_note.txt
+          # Εδώ διαβάζουμε το input που έγραψες στη φόρμα του Port
+          echo "${{ github.event.inputs.file_content }}" > portal_note.txt
       - name: Commit and Push
         run: |
           git config --global user.name "Port-Bot"
           git config --global user.email "bot@getport.io"
           git add .
-          git commit -m "docs: new file from portal"
+          git commit -m "docs: new file from portal with custom content"
           git push
