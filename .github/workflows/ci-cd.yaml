@@ -95,7 +95,7 @@ jobs:
       # GitOps Update (για το ArgoCD)
       - name: Update Kubernetes Manifest
         run: |
-          sed -i "s|image: nxcreed/my-nginx-app:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }}|g" nginx.yaml
+          sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/my-nginx-app:${{ github.sha }}|g" apps/base/nginx.yaml
           
       - name: Commit and Push
         run: |
