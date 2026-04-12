@@ -1,10 +1,13 @@
 name: Fix Port Scorecard
 on:
-  workflow_dispatch: # Επιτρέπει στο Port να το "χτυπήσει"
+  workflow_dispatch:
     inputs:
-      port_payload:
+      port_payload: # Αυτό που βάλαμε πριν
         description: 'Payload from Port'
-        required: true
+        required: false
+      port_context: # ΠΡΟΣΘΕΣΕ ΑΥΤΟ ΕΔΩ
+        description: 'Context from Port'
+        required: false
 
 jobs:
   fix-readme:
