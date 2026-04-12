@@ -101,6 +101,6 @@ jobs:
         run: |
           git config --global user.email "devsecops-bot@example.com"
           git config --global user.name "DevSecOps Bot"
-          git add nginx.yaml
+          git add apps/base/nginx.yaml
           git commit -m "chore: update image to ${{ github.sha }} [skip ci]"
           git push
