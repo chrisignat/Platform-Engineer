@@ -15,7 +15,10 @@ spec:
           tag: latest
         extraEnvVars:
           - name: LOCALSTACK_AUTH_TOKEN
-            value: "test"
+            valueFrom:
+              secretKeyRef:
+                name: localstack-secrets
+                key: auth-token
           - name: SERVICES
             value: "s3,sqs,lambda,sns,dynamodb"
           - name: DEBUG
