@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-db-postgres
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: postgresql
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 15.5.2
+    helm:
+      values: |
+        global:
+          postgresql:
+            auth:
+              database: platform_dev
+              username: user
+              password: password
+        primary:
+          persistence:
+            enabled: true
+            size: 8Gi
+            storageClass: "standard" # Σε K3d/Minikube άλλαξε το σε "local-path"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
