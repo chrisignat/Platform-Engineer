@@ -55,3 +55,16 @@ spec:
         emptyDir: {}
       - name: tmp-volume
         emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx # Πρέπει να ταιριάζει με το label του Deployment
+  ports:
+    - protocol: TCP
+      port: 80         # Η θύρα στην οποία θα ακούει το Service εξωτερικά
+      targetPort: 8080 # Η θύρα που ακούει ο nginx μέσα στο container
+  type: ClusterIP      # Χρησιμοποίησε NodePort ή LoadBalancer αν θες πρόσβαση εκτός cluster
