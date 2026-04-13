@@ -15,7 +15,7 @@ spec:
           tag: latest
         extraEnvVars:
           - name: SERVICES
-            value: "s3,sqs,lambda,rds,sns"
+            value: "s3,sqs,lambda,sns"
           - name: DEBUG
             value: "1"
           - name: LAMBDA_EXECUTOR
