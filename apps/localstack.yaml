@@ -18,8 +18,9 @@ spec:
         
         extraEnvVars:
           - name: SERVICES
-            # ΠΡΟΣΟΧΗ: Μόνο δωρεάν υπηρεσίες. ΟΧΙ rds, ΟΧΙ route53 κλπ.
             value: "s3,sqs,lambda,sns,dynamodb,iam,apigateway"
+          - name: ACTIVATE_PRO
+            value: "0"
           - name: DEBUG
             value: "1"
           - name: LAMBDA_EXECUTOR
