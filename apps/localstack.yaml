@@ -14,6 +14,7 @@ spec:
         image:
           repository: localstack/localstack
           tag: latest
+          pullPolicy: Always
         
         extraEnvVars:
           - name: LOCALSTACK_AUTH_TOKEN
@@ -22,13 +23,12 @@ spec:
                 name: localstack-secrets
                 key: auth-token
           - name: SERVICES
-            value: "s3,sqs,lambda,rds,sns,dynamodb,iam"
+            value: "s3,sqs,lambda,rds,sns,dynamodb"
           - name: DEBUG
             value: "1"
           - name: LAMBDA_EXECUTOR
             value: "local"
 
-        # Resources - Το Pro με RDS θέλει RAM!
         resources:
           requests:
             cpu: "200m"
@@ -38,11 +38,7 @@ spec:
             memory: "2Gi"
 
         persistence:
-          enabled: true
-          size: 5Gi
-        
-        service:
-          type: ClusterIP
+          enabled: false  # Κράτα το false μέχρι να δούμε το "Green"
 
   destination:
     server: https://kubernetes.default.svc
