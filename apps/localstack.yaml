@@ -18,6 +18,26 @@ spec:
             value: "s3,sqs,lambda,rds,sns"
           - name: DEBUG
             value: "1"
+          - name: LAMBDA_EXECUTOR
+            value: "local"
+          - name: DOCKER_HOST
+            value: "unix:///var/run/docker.sock"
+        
+        # Προσθήκη ορίων μνήμης και CPU
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+        # Δίνουμε περισσότερο χρόνο στο Probe να περιμένει το Localstack
+        livenessProbe:
+          initialDelaySeconds: 60
+        readinessProbe:
+          initialDelaySeconds: 60
+
         persistence:
           enabled: true
           size: 5Gi
