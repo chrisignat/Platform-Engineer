@@ -12,38 +12,34 @@ spec:
     helm:
       values: |
         image:
-          # Χρησιμοποιούμε το ρητό repository και pullPolicy Always για να ξεκολλήσει
           repository: localstack/localstack
-          tag: 3.0.0
-          pullPolicy: Always
+          tag: latest
         
         extraEnvVars:
+          - name: LOCALSTACK_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: localstack-secrets
+                key: auth-token
           - name: SERVICES
-            # ΜΟΝΟ δωρεάν υπηρεσίες. Αν υπάρχει RDS εδώ, θα φας πάλι Exit 55.
-            value: "s3,sqs,lambda,sns,dynamodb,iam,apigateway"
-          - name: ACTIVATE_PRO
-            value: "0"
+            value: "s3,sqs,lambda,rds,sns,dynamodb,iam"
           - name: DEBUG
             value: "1"
           - name: LAMBDA_EXECUTOR
             value: "local"
-          - name: LOCALSTACK_AUTH_TOKEN
-            value: ""
-        
-        # Απενεργοποιούμε το persistence προσωρινά για να σβηστούν παλιά Pro configs
-        persistence:
-          enabled: false
 
-        mountDind:
-          enabled: false
-
+        # Resources - Το Pro με RDS θέλει RAM!
         resources:
           requests:
             cpu: "200m"
-            memory: "512Mi"
-          limits:
-            cpu: "500m"
             memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+        persistence:
+          enabled: true
+          size: 5Gi
         
         service:
           type: ClusterIP
