@@ -24,8 +24,7 @@ spec:
             storageClass: "standard" # Σε K3d/Minikube άλλαξε το σε "local-path"
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
-  syncPolicy:
+    namespace: apps
     automated:
       prune: true
       selfHeal: true

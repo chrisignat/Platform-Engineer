@@ -1,11 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+
+namespace: apps
 # Λέμε στο Kustomize ποια είναι τα βασικά μας αρχεία
 resources:
   - nginx.yaml
   - nginx-hpa.yaml
   - developer-rbac.yaml
+
 
 # Εδώ αρχίζει η μαγεία! 
 # Θα προσθέσουμε αυτόματα ένα label σε ΟΛΑ μας τα resources, 
