@@ -11,6 +11,12 @@ spec:
     targetRevision: 1.15.4
     helm:
       values: |
+        hubble:
+          enabled: true
+          relay:
+            enabled: true
+          ui:
+            enabled: tru
         ipam:
           mode: kubernetes
         nodeinit:
