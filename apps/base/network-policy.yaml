@@ -22,3 +22,5 @@ spec:
     ports:
     - protocol: UDP
       port: 53
+    - protocol: TCP # Πρόσθεσε και το TCP
+      port: 53
