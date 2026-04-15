@@ -55,6 +55,9 @@ spec:
         emptyDir: {}
       - name: tmp-volume
         emptyDir: {}
+      - name: nginx-config
+        configMap:
+          name: nginx-configmap
 ---
 apiVersion: v1
 kind: Service
