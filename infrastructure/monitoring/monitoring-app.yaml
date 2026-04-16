@@ -32,6 +32,10 @@ spec:
 
         prometheus:
           prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            serviceMonitorSelector: {}
+            podMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelector: {}
             retention: 1h
             resources:
               limits:
