@@ -19,14 +19,11 @@ spec:
           
         prometheus:
           enabled: false # Κλείνουμε τον εσωτερικό Prometheus
-          
-        networkCosts:
-          enabled: true # Το αλλάζουμε σε true
         
         # Απενεργοποιούμε και τα υπόλοιπα components που δεν χρειάζονται
         # αφού έχουμε το δικό μας stack
         networkCosts:
-          enabled: false
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: kubecost
