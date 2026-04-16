@@ -77,10 +77,26 @@ This repository is a professional **Internal Developer Platform (IDP)** demonstr
 ## 🛠️ Troubleshooting
 
 ### 🐙 ArgoCD Sync Issues
+
+To get ArgoCD up and running, follow these steps:
+
+1. **Create the namespace:**
+   ```bash
+   kubectl create namespace argocd
+   ```
+2. **Install ArgoCD:**
+   ```bash
+   kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
+   ```
+3. 1. **Retrieve the initial admin password:**
+   ```bash
+   kubectl create namespace argocd
+   ```   
+
 If the ArgoCD sync hangs or gets stuck, run the following command to restart the repo server:
 
 ```bash
-kubectl rollout restart deployment argocd-repo-server -n argocd
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")))
 ```
 
 ### ☁️ LocalStack Setup
