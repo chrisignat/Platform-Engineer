@@ -24,6 +24,12 @@ spec:
         # αφού έχουμε το δικό μας stack
         networkCosts:
           enabled: true
+          
+        serviceMonitor:
+          enabled: true
+          # Βάζουμε το label που συνήθως ψάχνει ο Prometheus Operator
+          additionalLabels:
+            release: monitoring
   destination:
     server: https://kubernetes.default.svc
     namespace: kubecost
