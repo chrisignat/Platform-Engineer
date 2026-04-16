@@ -88,15 +88,15 @@ To get ArgoCD up and running, follow these steps:
    ```bash
    kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
    ```
-3. 1. **Retrieve the initial admin password:**
+3. **Retrieve the initial admin password:**
    ```bash
-   kubectl create namespace argocd
+   [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")))
    ```   
 
 If the ArgoCD sync hangs or gets stuck, run the following command to restart the repo server:
 
 ```bash
-[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")))
+kubectl rollout restart deployment argocd-repo-server -n argocd
 ```
 
 ### ☁️ LocalStack Setup
