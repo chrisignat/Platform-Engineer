@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubecost
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: cost-analyzer
+    repoURL: https://kubecost.github.io/cost-analyzer/
+    targetRevision: 2.2.0
+    helm:
+      values: |
+        kubecostProductConfigs:
+          clusterName: my-lab-cluster
+          # Εδώ ορίζουμε το URL του δικού σου Prometheus Service
+          # Μορφή: http://<service-name>.<namespace>.svc:9090
+          prometheusExternalUrl: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
+          
+        prometheus:
+          enabled: false # Κλείνουμε τον εσωτερικό Prometheus
+        
+        # Απενεργοποιούμε και τα υπόλοιπα components που δεν χρειάζονται
+        # αφού έχουμε το δικό μας stack
+        networkCosts:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubecost
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
