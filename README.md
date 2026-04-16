@@ -143,4 +143,4 @@ Contributions, ideas, and bug fixes are highly welcome! If you want to help impr
 * **🚀 Progressive Delivery:** Integrate **Argo Rollouts** for Canary and Blue-Green deployments.
 * **🔭 Full-Stack Observability:** Complement Prometheus with **Loki** (logs).
 * **💾 Disaster Recovery:** Setup **Velero** for automated backups.
-* * **💸 FinOps & Cost Monitoring:** Integrate **Kubecost** to track and optimize Kubernetes resource spending.
+* **💸 FinOps & Cost Monitoring:** Integrate **Kubecost** to track and optimize Kubernetes resource spending.
