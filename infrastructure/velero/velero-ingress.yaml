@@ -5,6 +5,8 @@ metadata:
   namespace: velero
   annotations:
     kubernetes.io/ingress.class: nginx
+    # Προσθέτουμε και αυτό για σιγουριά
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - host: velero.local
@@ -14,6 +16,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: velero-server
+            name: velero       # <--- ΑΛΛΑΓΗ: Από "velero-server" σε "velero"
             port:
-              number: 80
+              number: 8085     # <--- ΑΛΛΑΓΗ: Από "80" σε "8085"
