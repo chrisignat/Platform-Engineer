@@ -12,7 +12,7 @@ spec:
     helm:
       values: |
         configuration:
-          # Χρήση λίστας (array) για αποφυγή του "coalesce.go" error
+          # Χρήση λίστας για συμβατότητα με Velero Chart v6+
           backupStorageLocation:
             - name: default
               provider: aws

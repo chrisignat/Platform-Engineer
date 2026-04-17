@@ -16,6 +16,13 @@ spec:
           tag: latest
           pullPolicy: Always
         
+        # --- Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ IMAGE PULL ERROR ---
+        kubectl:
+          image:
+            repository: docker.io/bitnami/kubectl
+            tag: latest
+        # ------------------------------------------
+
         extraEnvVars:
           - name: LOCALSTACK_AUTH_TOKEN
             valueFrom:
@@ -29,11 +36,9 @@ spec:
           - name: DOCKER_HOST
             value: unix:///var/run/docker.sock
         
-        # ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΗΝ EC2 ΣΤΑ WINDOWS
         mountDind:
-          enabled: false # Απενεργοποιούμε το εσωτερικό Docker...
+          enabled: false
         
-        # ...και κάνουμε mount το Docker των Windows
         volumes:
           - name: docker-sock
             hostPath:
@@ -48,12 +53,11 @@ spec:
             memory: "1Gi"
           limits:
             cpu: "1000m"
-            memory: "2Gi" # Το EC2 θέλει μνήμη!
+            memory: "2Gi"
 
   destination:
     server: https://kubernetes.default.svc
     namespace: localstack
-
   syncPolicy:
     automated:
       prune: true
