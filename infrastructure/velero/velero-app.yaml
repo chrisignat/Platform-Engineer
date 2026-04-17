@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: velero
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: velero
+    repoURL: https://vmware-tanzu.github.io/helm-charts
+    targetRevision: 6.0.0
+    helm:
+      values: |
+        configuration:
+          backupStorageLocation:
+            name: default
+            provider: aws
+            bucket: velero-backups
+            config:
+              region: us-east-1
+              s3ForcePathStyle: true
+              # Το URL του LocalStack service μέσα στο cluster
+              s3Url: http://localstack-aws.localstack.svc.local:4566
+          volumeSnapshotLocation:
+            name: default
+            provider: aws
+        
+        initContainers:
+          - name: velero-plugin-for-aws
+            image: velero/velero-plugin-for-aws:v1.9.0
+            volumeMounts:
+              - mountPath: /plugins
+                name: plugins
+
+        credentials:
+          secretContents:
+            cloud: |
+              [default]
+              aws_access_key_id = test
+              aws_secret_access_key = test
+
+        # Ενεργοποιούμε το UI
+        ui:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: velero
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
