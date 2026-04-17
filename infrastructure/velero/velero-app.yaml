@@ -15,7 +15,7 @@ spec:
         kubectl:
           image:
             repository: registry.k8s.io/kubectl
-            tag: v1.34.0
+            tag: latest
             
         configuration:
           # Χρήση λίστας για συμβατότητα με Velero Chart v6+
