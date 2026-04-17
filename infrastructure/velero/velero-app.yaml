@@ -14,8 +14,8 @@ spec:
         # --- ΠΡΟΣΘΗΚΗ: Διόρθωση για το ImagePullBackOff του kubectl ---
         kubectl:
           image:
-            repository: docker.io/bitnami/kubectl
-            tag: latest
+            repository: rancher/kubectl
+            tag: v1.30.3
         # --------------------------------------------------------------
 
         configuration:
