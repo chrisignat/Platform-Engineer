@@ -11,13 +11,11 @@ spec:
     targetRevision: 6.0.0
     helm:
       values: |
-        # --- ΠΡΟΣΘΗΚΗ: Διόρθωση για το ImagePullBackOff του kubectl ---
-        kubectl:
-          image:
-            repository: rancher/kubectl
-            tag: v1.30.3
-        # --------------------------------------------------------------
-
+        # --- ΟΡΙΣΤΙΚΗ ΛΥΣΗ ΓΙΑ ΤΟ ARGOCD ---
+        # Απενεργοποίηση των προβληματικών CRD Hooks που προκαλούν τα errors
+        upgradeCRDs: false
+        cleanUpCRDs: false
+        
         configuration:
           # Χρήση λίστας για συμβατότητα με Velero Chart v6+
           backupStorageLocation:
