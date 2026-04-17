@@ -11,12 +11,10 @@ spec:
     targetRevision: 6.0.0
     helm:
       values: |
-        # Απενεργοποίηση των CRD Hooks για αποφυγή errors στο ArgoCD
         upgradeCRDs: false
         cleanUpCRDs: false
         
         configuration:
-          # Σωστή δομή λίστας για το Velero Helm Chart v6+
           backupStorageLocation:
             - name: default
               provider: aws
@@ -24,9 +22,7 @@ spec:
               config:
                 region: us-east-1
                 s3ForcePathStyle: true
-                # Διόρθωση DNS: προσθήκη .cluster.local
                 s3Url: http://localstack-aws.localstack.svc.cluster.local:4566
-          
           volumeSnapshotLocation:
             - name: default
               provider: aws
@@ -40,22 +36,26 @@ spec:
               - mountPath: /target
                 name: plugins
 
+        # ΠΡΟΣΘΗΚΗ ΤΟΥ UI ΩΣ SIDECAR
+        sidecarContainers:
+          - name: velero-ui
+            image: vmware-tanzu/velero-dashboard:v0.1.0
+            ports:
+              - containerPort: 8080
+        
+        # ΑΝΟΙΓΜΑ ΤΗΣ ΠΟΡΤΑΣ 8080 ΣΤΟ SERVICE
+        service:
+          additionalPorts:
+            - name: ui
+              port: 8080
+              targetPort: 8080
+
         credentials:
           secretContents:
             cloud: |
               [default]
               aws_access_key_id = test
               aws_secret_access_key = test
-
-        # Ενεργοποίηση του Web UI (προαιρετικό)
-        ui:
-          enabled: true
-        sidecarContainers:
-          - name: velero-ui
-            image: vmware-tanzu/velero-dashboard:v0.1.0
-            ports:
-              - containerPort: 8080
-                name: ui
   
   destination:
     server: https://kubernetes.default.svc
