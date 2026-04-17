@@ -37,7 +37,7 @@ spec:
           - name: velero-plugin-for-aws
             image: velero/velero-plugin-for-aws:v1.9.0
             volumeMounts:
-              - mountPath: /plugins
+              - mountPath: /target
                 name: plugins
 
         credentials:
