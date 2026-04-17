@@ -12,18 +12,22 @@ spec:
     helm:
       values: |
         configuration:
+          # ΠΡΟΣΟΧΗ: Έγινε λίστα (προστέθηκε το - )
           backupStorageLocation:
-            name: default
-            provider: aws
-            bucket: velero-backups
-            config:
-              region: us-east-1
-              s3ForcePathStyle: true
-              # Το URL του LocalStack service μέσα στο cluster
-              s3Url: http://localstack-aws.localstack.svc.local:4566
+            - name: default
+              provider: aws
+              bucket: velero-backups
+              config:
+                region: us-east-1
+                s3ForcePathStyle: true
+                s3Url: http://localstack-aws.localstack.svc.local:4566
+          
+          # ΠΡΟΣΟΧΗ: Έγινε λίστα (προστέθηκε το - )
           volumeSnapshotLocation:
-            name: default
-            provider: aws
+            - name: default
+              provider: aws
+              config:
+                region: us-east-1
         
         initContainers:
           - name: velero-plugin-for-aws
@@ -39,7 +43,6 @@ spec:
               aws_access_key_id = test
               aws_secret_access_key = test
 
-        # Ενεργοποιούμε το UI
         ui:
           enabled: true
   destination:
