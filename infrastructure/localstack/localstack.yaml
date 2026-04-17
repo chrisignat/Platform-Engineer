@@ -1,66 +1,50 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: localstack-aws
+  name: velero
   namespace: argocd
 spec:
   project: default
   source:
-    chart: localstack
-    repoURL: https://localstack.github.io/helm-charts
-    targetRevision: 0.6.14
+    chart: velero
+    repoURL: https://vmware-tanzu.github.io/helm-charts
+    targetRevision: 6.0.0
     helm:
       values: |
-        image:
-          repository: localstack/localstack
-          tag: latest
-          pullPolicy: Always
+        configuration:
+          backupStorageLocation:
+            - name: default
+              provider: aws
+              bucket: velero-backups
+              config:
+                region: us-east-1
+                s3ForcePathStyle: true
+                # ΕΔΩ ΤΟ ΒΑΖΕΙΣ:
+                s3Url: http://localstack-aws.localstack.svc.cluster.local:4566
+          
+          volumeSnapshotLocation:
+            - name: default
+              provider: aws
+              config:
+                region: us-east-1
         
-        # --- Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ IMAGE PULL ERROR ---
-        kubectl:
-          image:
-            repository: docker.io/bitnami/kubectl
-            tag: latest
-        # ------------------------------------------
+        initContainers:
+          - name: velero-plugin-for-aws
+            image: velero/velero-plugin-for-aws:v1.9.0
+            volumeMounts:
+              - mountPath: /target
+                name: plugins
 
-        extraEnvVars:
-          - name: LOCALSTACK_AUTH_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: localstack-secrets
-                key: auth-token
-          - name: SERVICES
-            value: "s3,sqs,lambda,sns,dynamodb,ec2,iam"
-          - name: DEBUG
-            value: "1"
-          - name: DOCKER_HOST
-            value: unix:///var/run/docker.sock
-        
-        mountDind:
-          enabled: false
-        
-        volumes:
-          - name: docker-sock
-            hostPath:
-              path: /var/run/docker.sock
-        volumeMounts:
-          - name: docker-sock
-            mountPath: /var/run/docker.sock
-
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "1Gi"
-          limits:
-            cpu: "1000m"
-            memory: "2Gi"
-
+        credentials:
+          secretContents:
+            cloud: |
+              [default]
+              aws_access_key_id = test
+              aws_secret_access_key = test
   destination:
     server: https://kubernetes.default.svc
-    namespace: localstack
+    namespace: velero
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
