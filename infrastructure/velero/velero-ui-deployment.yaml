@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velero-ui
+  namespace: velero
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: velero-ui
+  template:
+    metadata:
+      labels:
+        app: velero-ui
+    spec:
+      serviceAccountName: velero-server # Χρησιμοποιούμε το account του velero για να έχει πρόσβαση στα δεδομένα
+      containers:
+        - name: velero-ui
+          image: ghcr.io/otwld/velero-ui:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi

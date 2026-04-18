@@ -5,7 +5,7 @@ metadata:
   namespace: velero
 spec:
   selector:
-    app.kubernetes.io/name: velero # Αυτό συνδέει το service με το pod
+    app: velero-ui # ΑΛΛΑΓΗ ΕΔΩ: Ψάχνει το νέο label του UI pod
   ports:
     - protocol: TCP
       port: 8080

@@ -36,16 +36,6 @@ spec:
               - mountPath: /target
                 name: plugins
 
-        # ΣΩΣΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΟ HELM CHART v6.0.0
-        extraContainers:
-          - name: velero-ui
-            image: ghcr.io/otwld/velero-ui:latest
-            ports:
-              - containerPort: 8080
-            env:
-              - name: VELERO_SERVER_ADDRESS
-                value: "localhost:9087"
-
         credentials:
           secretContents:
             cloud: |
