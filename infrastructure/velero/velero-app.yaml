@@ -36,8 +36,8 @@ spec:
               - mountPath: /target
                 name: plugins
 
-        # ΠΡΟΣΟΧΗ: Η στοίχιση πρέπει να είναι ίδια με το initContainers
-        sidecarContainers:
+        # ΣΩΣΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΟ HELM CHART v6.0.0
+        extraContainers:
           - name: velero-ui
             image: ghcr.io/otwld/velero-ui:latest
             ports:

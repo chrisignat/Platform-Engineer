@@ -15,6 +15,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: velero-ui-service # Πρέπει να ταυτίζεται με το όνομα στο Service
+            name: velero-ui-service
             port:
               number: 8080
