@@ -5,9 +5,9 @@ metadata:
   namespace: velero
 spec:
   selector:
-    app: velero-ui # ΑΛΛΑΓΗ ΕΔΩ: Ψάχνει το νέο label του UI pod
+    app: velero-ui
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8080         # Αυτό που ζητάει το Ingress
+      targetPort: 3000   # Αυτό που ζητάει το νέο Pod
   type: ClusterIP
