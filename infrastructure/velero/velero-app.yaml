@@ -42,14 +42,7 @@ spec:
             image: ghcr.io/otwld/velero-ui:latest
             ports:
               - containerPort: 8080
-
-        # ΑΝΟΙΓΜΑ ΠΟΡΤΑΣ ΣΤΟ SERVICE
-        service:
-          additionalPorts:
-            - name: ui-port
-              port: 8080
-              targetPort: 8080
-
+              
         credentials:
           secretContents:
             cloud: |
