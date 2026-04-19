@@ -16,12 +16,10 @@ spec:
           enabled: false
         
         prometheusOperator:
-          # --- ΠΡΟΣΘΗΚΗ: Απενεργοποίηση των Webhooks που κολλάνε ---
           admissionWebhooks:
             enabled: false
           tls:
             enabled: false
-          # ---------------------------------------------------------
           resources:
             limits:
               cpu: 100m
@@ -53,10 +51,10 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
-              
-         additionalDataSources:
+          # Προσθήκη του Loki ως Data Source (σωστά στοιχισμένο)
+          additionalDataSources:
             - name: Loki
-              type: loku
+              type: loki
               url: http://loki-stack.monitoring.svc.cluster.local:3100
               access: proxy
               isDefault: false
