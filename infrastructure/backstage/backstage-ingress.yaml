@@ -3,14 +3,18 @@ kind: Ingress
 metadata:
   name: backstage-ingress
   namespace: backstage
+  annotations:
+    # Αναγκάζουμε το Nginx να αναγνωρίσει το configuration
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
   - host: backstage.local
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /.* # Πιάνουμε όλα τα μονοπάτια
+        pathType: ImplementationSpecific
         backend:
           service:
             name: backstage
