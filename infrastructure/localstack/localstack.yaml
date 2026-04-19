@@ -16,14 +16,24 @@ spec:
           tag: latest
           pullPolicy: Always
         
-        # --- Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ IMAGE PULL ERROR ---
+        # Ενεργοποίηση μόνιμης αποθήκευσης (Persistence)
+        persistence:
+          enabled: true
+          size: 5Gi
+          # Αν το cluster σου έχει συγκεκριμένο storage class (π.χ. στο k3d είναι το "local-path")
+          # storageClass: "local-path"
+
+        # Διόρθωση για το kubectl image pull error
         kubectl:
           image:
             repository: docker.io/bitnami/kubectl
             tag: latest
-        # ------------------------------------------
 
         extraEnvVars:
+          - name: PERSISTENCE
+            value: "1"
+          - name: LOCALSTACK_PERSISTENCE_DIR
+            value: "/var/lib/localstack"
           - name: LOCALSTACK_AUTH_TOKEN
             valueFrom:
               secretKeyRef:
@@ -54,7 +64,6 @@ spec:
           limits:
             cpu: "1000m"
             memory: "2Gi"
-
   destination:
     server: https://kubernetes.default.svc
     namespace: localstack
