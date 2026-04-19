@@ -8,12 +8,15 @@ spec:
   source:
     chart: backstage
     repoURL: https://backstage.github.io/charts
-    targetRevision: 1.0.0  # Επιβεβαίωσε την έκδοση από το helm search
+    targetRevision: 1.0.0
     helm:
-      # Διόρθωση για το πρόβλημα με το SSL πιστοποιητικό του schema validator
       skipSchemaValidation: true
       values: |
         backstage:
+          image:
+            registry: docker.io
+            repository: nxcreed/my-backstage
+            tag: v1
           appConfig:
             app:
               baseUrl: http://backstage.local
@@ -26,7 +29,6 @@ spec:
                 - host: github.com
                   token: ${GITHUB_TOKEN}
           
-          # Περνάμε το GitHub Token από το Secret που έφτιαξες
           extraEnvVars:
             - name: GITHUB_TOKEN
               valueFrom:
@@ -34,14 +36,12 @@ spec:
                   name: github-secrets
                   key: token
 
-        # Ρυθμίσεις για την εσωτερική PostgreSQL
         postgresql:
           enabled: true
           image:
             registry: docker.io
             repository: bitnami/postgresql
-            # Διόρθωση για το ImagePullBackOff - χρησιμοποιούμε tag που υπάρχει σίγουρα
-            tag: latest
+            tag: 15
           auth:
             postgresqlPassword: "backstage-password"
           primary:
@@ -55,4 +55,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    createNamespace: true
