@@ -16,4 +16,4 @@ spec:
           service:
             name: backstage # Το όνομα του service που δημιουργεί το Helm chart
             port:
-              number: 80
+              number: 7007
