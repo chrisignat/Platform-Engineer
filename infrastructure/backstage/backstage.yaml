@@ -41,7 +41,7 @@ spec:
           image:
             registry: docker.io
             repository: bitnami/postgresql
-            tag: 15-debian-11
+            tag: latest
           auth:
             postgresqlPassword: "backstage-password"
           primary:
