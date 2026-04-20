@@ -21,8 +21,8 @@ spec:
             app:
               title: "Internal Developer Portal"
               baseUrl: http://backstage.local
-            features:
-              notifications: false  
+            notifications:
+                enabled: false
             backend:
               baseUrl: http://backstage.local
               cors:
