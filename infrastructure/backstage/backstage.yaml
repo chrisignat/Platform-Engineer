@@ -28,7 +28,8 @@ spec:
                   host: backstage-postgresql
                   port: 5432
                   user: postgres
-                  password: "backstage-password"
+                  # Αντλεί τον κωδικό από τη μεταβλητή περιβάλλοντος
+                  password: ${POSTGRES_PASSWORD}
             integrations:
               github:
                 - host: github.com
@@ -40,15 +41,22 @@ spec:
                 secretKeyRef:
                   name: github-secrets
                   key: token
+            # Φέρνουμε τον κωδικό της βάσης από το νέο Secret στο Backstage pod
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-password
 
         postgresql:
           enabled: true
           image:
             registry: docker.io
             repository: bitnami/postgresql
-            tag: "latest" # Σταθερή έκδοση, διαθέσιμη στο Docker Hub
+            tag: "latest" # Ή όποιο tag βρήκες νωρίτερα
           auth:
-            postgresqlPassword: "backstage-password"
+            # Το chart της Bitnami θα διαβάσει τον κωδικό απευθείας από το Secret!
+            existingSecret: "postgres-secrets"
           primary:
             persistence:
               enabled: true
