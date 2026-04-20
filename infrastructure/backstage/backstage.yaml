@@ -22,6 +22,8 @@ spec:
               baseUrl: http://backstage.local
             backend:
               baseUrl: http://backstage.local
+              cors:
+                origin: http://backstage.local
               database:
                 client: pg
                 connection:
