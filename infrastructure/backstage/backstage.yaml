@@ -15,8 +15,8 @@ spec:
         backstage:
           image:
             registry: docker.io
-            repository: nxcreed/my-backstage # Το δικό σου σωστό image
-            tag: latest
+            repository: nxcreed/my-backstage # Το δικό σου custom image
+            tag: v1                           # Το σωστό tag
           appConfig:
             app:
               baseUrl: http://backstage.local
@@ -24,7 +24,7 @@ spec:
               baseUrl: http://backstage.local
               database:
                 client: pg
-                connection: # ΑΥΤΟ ΕΛΕΙΠΕ
+                connection:                   # Η σύνδεση που έλειπε
                   host: backstage-postgresql
                   port: 5432
                   user: postgres
@@ -43,6 +43,10 @@ spec:
 
         postgresql:
           enabled: true
+          image:                              # Προσθήκη για να λυθεί το ImagePullBackOff
+            registry: docker.io
+            repository: bitnami/postgresql
+            tag: latest                         # Χρησιμοποιούμε σταθερό tag
           auth:
             postgresqlPassword: "backstage-password"
           primary:
