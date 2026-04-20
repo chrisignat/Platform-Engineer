@@ -15,8 +15,8 @@ spec:
         backstage:
           image:
             registry: docker.io
-            repository: nxcreed/my-backstage
-            tag: v4
+            repository: nxcreed/my-backstage # Το δικό σου σωστό image
+            tag: v1 # Το σωστό tag
           appConfig:
             app:
               baseUrl: http://backstage.local
@@ -24,6 +24,11 @@ spec:
               baseUrl: http://backstage.local
               database:
                 client: pg
+                connection: # ΑΥΤΟ ΕΛΕΙΠΕ
+                  host: backstage-postgresql
+                  port: 5432
+                  user: postgres
+                  password: "backstage-password"
             integrations:
               github:
                 - host: github.com
@@ -38,11 +43,6 @@ spec:
 
         postgresql:
           enabled: true
-          image:
-            registry: docker.io
-            repository: bitnami/postgresql
-            tag: latest
-            pullPolicy: Always
           auth:
             postgresqlPassword: "backstage-password"
           primary:
