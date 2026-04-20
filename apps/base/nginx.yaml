@@ -19,7 +19,7 @@ spec:
         fsGroup: 101 
       containers:
       - name: nginx
-        image: nxcreed/my-nginx-app:27ebf24362f6e5b4c42fdf3c793444a0be0351bd
+        image: nxcreed/my-nginx-app:70d4810640fc7e97bb42640ca83eb042c18afc37
         command: ["/bin/sh", "-c", "sed -i 's/listen  80;/listen 8080;/g' /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
         securityContext:
           allowPrivilegeEscalation: false
