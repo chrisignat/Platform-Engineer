@@ -25,6 +25,8 @@ spec:
               baseUrl: http://backstage.local
               cors:
                 origin: http://backstage.local
+                methods: [GET, POST, PUT, DELETE, OPTIONS]
+                allowedHeaders: [Content-Type, Authorization]
               database:
                 client: pg
                 connection:
@@ -33,6 +35,9 @@ spec:
                   user: postgres
                   # Αντλεί τον κωδικό από τη μεταβλητή περιβάλλοντος
                   password: ${POSTGRES_PASSWORD}
+            auth:
+              providers:
+                guest: {}        
             integrations:
               github:
                 - host: github.com
