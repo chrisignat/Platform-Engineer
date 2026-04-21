@@ -37,7 +37,8 @@ spec:
                   password: ${POSTGRES_PASSWORD}
             auth:
               providers:
-                guest: {}        
+                guest: {}
+            signInPage: guest        
             integrations:
               github:
                 - host: github.com
