@@ -16,7 +16,7 @@ spec:
           image:
             registry: docker.io
             repository: nxcreed/my-backstage
-            tag: v14
+            tag: v13
           
           appConfig:
             app:
