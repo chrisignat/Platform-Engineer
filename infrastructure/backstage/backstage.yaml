@@ -24,7 +24,7 @@ spec:
             auth:
               providers:
                 guest: {}
-            signInPage: guest 
+          signInPage: guest 
             backend:
               baseUrl: http://backstage.local
               cors:
