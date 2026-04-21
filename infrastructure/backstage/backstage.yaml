@@ -16,7 +16,7 @@ spec:
           image:
             registry: docker.io
             repository: nxcreed/my-backstage
-            tag: v12
+            tag: v13
           appConfig:
             app:
               title: "Internal Developer Portal"
