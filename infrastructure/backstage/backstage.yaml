@@ -41,7 +41,7 @@ spec:
               cors:
                 origin: http://backstage.local
                 methods: [GET, POST, PUT, DELETE, OPTIONS]
-                allowedHeaders: [Content-Type, Authorization, Cookie, X-Authorization]
+                allowedHeaders: [Content-Type, Authorization, Cookie, X-Authorization, X-Requested-With]
                 credentials: true # <--- ΚΡΙΣΙΜΟ ΓΙΑ ΤΗΝ ΑΣΠΡΗ ΟΘΟΝΗ
               
               database:

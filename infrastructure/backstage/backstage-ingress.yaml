@@ -4,6 +4,7 @@ metadata:
   name: backstage-ingress
   namespace: backstage
   annotations:
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Authorization"
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"      # Απενεργοποιεί το αυτόματο HTTPS
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
