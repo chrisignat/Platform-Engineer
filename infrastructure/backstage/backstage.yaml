@@ -23,7 +23,8 @@ spec:
               baseUrl: http://backstage.local
             auth:
               providers:
-                guest: {}
+                guest:
+                  dangerouslyAllowQuietGuestAllowList: [ 'guest' ]
           signInPage: guest 
             backend:
               baseUrl: http://backstage.local
