@@ -21,6 +21,10 @@ spec:
             app:
               title: "Internal Developer Portal"
               baseUrl: http://backstage.local
+            auth:
+              providers:
+                guest: {}
+            signInPage: guest 
             backend:
               baseUrl: http://backstage.local
               cors:
@@ -34,11 +38,7 @@ spec:
                   port: 5432
                   user: postgres
                   # Αντλεί τον κωδικό από τη μεταβλητή περιβάλλοντος
-                  password: ${POSTGRES_PASSWORD}
-            auth:
-              providers:
-                guest: {}
-            signInPage: guest        
+                  password: ${POSTGRES_PASSWORD}       
             integrations:
               github:
                 - host: github.com
