@@ -16,7 +16,7 @@ spec:
           image:
             registry: docker.io
             repository: nxcreed/my-backstage
-            tag: v13
+            tag: v14  # <--- Βεβαιώσου ότι έχεις κάνει build/push με το signInPageModule στο App.tsx
           
           appConfig:
             app:
@@ -30,6 +30,23 @@ spec:
                 methods: [GET, POST, PUT, DELETE, OPTIONS]
                 allowedHeaders: [Content-Type, Authorization, Cookie]
                 credentials: true
+              
+              # ΔΙΟΡΘΩΣΗ ΒΑΣΗΣ: Επιβολή PostgreSQL για να μην ψάχνει την SQLite
+              database:
+                client: pg
+                connection:
+                  host: backstage-postgresql
+                  port: 5432
+                  user: postgres
+                  password: ${POSTGRES_PASSWORD}
+                plugin:
+                  catalog:
+                    client: pg
+                  scaffolder:
+                    client: pg
+                  auth:
+                    client: pg
+              
               auth:
                 keys:
                   - secret: ${BACKEND_SECRET}
@@ -38,6 +55,7 @@ spec:
               environment: development
               providers:
                 guest:
+                  # Αυτό ξεκλειδώνει το 403 Forbidden
                   dangerouslyAllowQuietGuestAllowList: [ 'guest' ]
                 github:
                   development:
@@ -46,7 +64,13 @@ spec:
             
             signInPage: guest 
 
+            integrations:
+              github:
+                - host: github.com
+                  token: ${GITHUB_TOKEN}
+          
           extraEnvVars:
+            # Τραβάμε τα μυστικά από το Kubernetes Secret "backstage-secrets"
             - name: BACKEND_SECRET
               valueFrom:
                 secretKeyRef:
@@ -72,6 +96,18 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: postgres-password
+
+        postgresql:
+          enabled: true
+          image:
+            registry: docker.io
+            repository: bitnami/postgresql
+            tag: "latest"
+          auth:
+            existingSecret: "backstage-db-auth"
+            secretKeys: 
+              userPasswordKey: "password"
+              adminPasswordKey: "password"
 
   destination:
     server: https://kubernetes.default.svc
