@@ -16,7 +16,7 @@ spec:
           image:
             registry: docker.io
             repository: nxcreed/my-backstage
-            tag: v13
+            tag: v14
           
           appConfig:
             app:
@@ -31,7 +31,6 @@ spec:
                 allowedHeaders: [Content-Type, Authorization, Cookie]
                 credentials: true
               
-              # ΕΔΩ ΕΙΝΑΙ Η ΑΛΛΑΓΗ ΠΟΥ ΘΑ ΤΟ ΣΩΣΕΙ
               database:
                 client: pg
                 connection:
@@ -39,7 +38,7 @@ spec:
                   port: 5432
                   user: postgres
                   password: ${POSTGRES_PASSWORD}
-                # Αυτό το block αναγκάζει ΟΛΑ τα plugins να παίξουν με PostgreSQL
+                # Εξασφαλίζουμε ότι όλα τα plugins χρησιμοποιούν Postgres
                 plugin:
                   default:
                     client: pg
@@ -87,13 +86,19 @@ spec:
                   name: postgres-secrets
                   key: postgres-password
 
+        # ΕΔΩ ΕΙΝΑΙ Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΗΝ POSTGRESQL LATEST
         postgresql:
           enabled: true
+          image:
+            registry: docker.io
+            repository: bitnami/postgresql
+            tag: latest  # <--- Χρησιμοποιεί την τελευταία έκδοση
           auth:
             existingSecret: "backstage-db-auth"
             secretKeys: 
               userPasswordKey: "password"
               adminPasswordKey: "password"
+
   destination:
     server: https://kubernetes.default.svc
     namespace: backstage
