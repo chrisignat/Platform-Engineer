@@ -16,61 +16,64 @@ spec:
           image:
             registry: docker.io
             repository: nxcreed/my-backstage
-            tag: v13
+            tag: v14
+          
           appConfig:
             app:
               title: "Internal Developer Portal"
               baseUrl: http://backstage.local
-            auth:
-              providers:
-                guest:
-                  dangerouslyAllowQuietGuestAllowList: [ 'guest' ]
-          signInPage: guest 
+            
             backend:
               baseUrl: http://backstage.local
               cors:
                 origin: http://backstage.local
                 methods: [GET, POST, PUT, DELETE, OPTIONS]
-                allowedHeaders: [Content-Type, Authorization]
+                allowedHeaders: [Content-Type, Authorization, Cookie]
                 credentials: true
-              database:
-                client: pg
-                connection:
-                  host: backstage-postgresql
-                  port: 5432
-                  user: postgres
-                  # Αντλεί τον κωδικό από τη μεταβλητή περιβάλλοντος
-                  password: ${POSTGRES_PASSWORD}       
-            integrations:
-              github:
-                - host: github.com
-                  token: ${GITHUB_TOKEN}
-          
+              auth:
+                keys:
+                  - secret: ${BACKEND_SECRET}
+
+            auth:
+              environment: development
+              providers:
+                guest:
+                  dangerouslyAllowQuietGuestAllowList: [ 'guest' ]
+                github:
+                  development:
+                    clientId: ${GITHUB_CLIENT_ID}
+                    clientSecret: ${GITHUB_CLIENT_SECRET}
+            
+            signInPage: guest 
+
           extraEnvVars:
+            # Τραβάμε τα κρυφά values από το Secret που φτιάξαμε στο Kubernetes
+            - name: BACKEND_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: BACKEND_SECRET
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_CLIENT_ID
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: GITHUB_CLIENT_SECRET
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: github-secrets
                   key: token
-            # Φέρνουμε τον κωδικό της βάσης από το νέο Secret στο Backstage pod
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secrets
                   key: postgres-password
 
-        postgresql:
-          enabled: true
-          image:
-            registry: docker.io
-            repository: bitnami/postgresql
-            tag: "latest" # Ή όποιο tag βρήκες νωρίτερα
-          auth:
-            existingSecret: "backstage-db-auth"
-            # ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ: Λέμε στο Helm ποιο entry να κοιτάξει
-            secretKeys: 
-              userPasswordKey: "password"
-              adminPasswordKey: "password"
   destination:
     server: https://kubernetes.default.svc
     namespace: backstage
