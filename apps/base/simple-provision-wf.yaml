@@ -1,22 +1,40 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Workflow
+kind: WorkflowTemplate
 metadata:
-  generateName: simple-deploy-
+  name: dynamic-provision-nginx
   namespace: argo
 spec:
+  # Χρησιμοποιούμε το default service account που έχει τα RBAC δικαιώματα
+  serviceAccountName: default 
   arguments:
     parameters:
     - name: app-name
-      value: "my-new-nginx" # Ο developer μπορεί να το αλλάξει από το UI
-  
-  entrypoint: deploy-step
-  
+      value: "dev-app-1"
+
+  entrypoint: main
   templates:
-  - name: deploy-step
+  - name: main
+    steps:
+    - - name: create-namespace
+        template: make-ns
+    - - name: deploy-argocd-app
+        template: make-argo-app
+
+  # Template 1: Δημιουργία Namespace
+  - name: make-ns
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{workflow.parameters.app-name}}
+
+  # Template 2: Δημιουργία ArgoCD Application
+  - name: make-argo-app
     resource:
       action: create
       manifest: |
-        # Αυτό είναι το nginx-app.yaml που μου έστειλες, αλλά με δυναμικό όνομα
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
@@ -25,13 +43,18 @@ spec:
         spec:
           project: default
           source:
-            repoURL: https://github.com/chrisignat/Platform-Engineer.git 
+            repoURL: https://github.com/chrisignat/Platform-Engineer.git
             targetRevision: main
-            path: apps/base
+            path: apps/base/manifests
           destination:
             server: https://kubernetes.default.svc
-            namespace: default # Εδώ θα μπει το nginx
+            namespace: {{workflow.parameters.app-name}}
           syncPolicy:
             automated:
               prune: true
               selfHeal: true
+            syncOptions:
+            - CreateNamespace=false # Το φτιάξαμε ήδη εμείς στο προηγούμενο step
+            - NamespaceAutoPropagation=true
+            - ApplyOutOfSyncOnly=true
+            - RespectIgnoreDifferences=true

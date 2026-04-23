@@ -1,0 +1,23 @@
+# 1. Φτιάχνουμε έναν κανόνα που επιτρέπει τη δημιουργία Namespaces σε όλο τον cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-namespace-creator
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch", "create", "delete", "patch"]
+---
+# 2. Συνδέουμε αυτόν τον κανόνα με το ServiceAccount του Argo Workflows
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-default-ns-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: argo
+roleRef:
+  kind: ClusterRole
+  name: argo-namespace-creator
+  apiGroup: rbac.authorization.k8s.io
