@@ -33,7 +33,7 @@ spec:
             serviceMonitorSelector: {}
             podMonitorSelectorNilUsesHelmValues: false
             podMonitorSelector: {}
-            retention: 1h
+            retention: 168h
             resources:
               limits:
                 cpu: 200m
