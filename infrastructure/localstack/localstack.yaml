@@ -26,8 +26,6 @@ spec:
             tag: latest
 
         extraEnvVars:
-          - name: PERSISTENCE
-            value: "1"
           - name: LOCALSTACK_PERSISTENCE_DIR
             value: "/var/lib/localstack"
           - name: LOCALSTACK_AUTH_TOKEN
@@ -37,8 +35,6 @@ spec:
                 key: auth-token
           - name: SERVICES
             value: "s3,sqs,lambda,sns,dynamodb,ec2,iam"
-          - name: DEBUG
-            value: "1"
           - name: DOCKER_HOST
             value: unix:///var/run/docker.sock
         
