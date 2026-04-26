@@ -24,10 +24,10 @@ This repository is an ongoing project aimed at building a professional **Interna
 
 ---
 
-## 📦 Internal Developer Platform (Backstage & Port)
-* **Backstage.io:** Centralized portal for infrastructure and service management.
-* **Port Integration:** Advanced software catalog and scorecard system.
-* **Self-Service Actions:** Features a `Fix Port Scorecard` workflow, allowing developers to automate documentation updates directly from the Port UI.
+## 📦 Internal Developer Platform (Argo Workflows & Port)
+* **Argo Workflows:** The central orchestration engine for managing service and infrastructure lifecycles through Kubernetes-native workflows.
+* **Port Integration:** Advanced software catalog and scorecard system where Argo Workflows act as the execution layer to populate and update Port entities.
+* **Self-Service Actions:** Features a `Fix Port Scorecard` workflow template. This allows developers to trigger automated documentation updates and compliance fixes directly from the Port UI, executed as scalable Argo jobs.
 
 ## 🔄 GitOps & Continuous Delivery (ArgoCD)
 * **App-of-Apps Pattern:** A **Root-App** (found in `/bootstrap`) recursively manages all platform components within the `/infrastructure` directory.
