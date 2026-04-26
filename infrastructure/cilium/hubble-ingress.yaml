@@ -2,19 +2,19 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hubble-ui-ingress
-  namespace: kube-system # <--- ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ! Πρέπει να είναι το ίδιο με το Cilium
+  namespace: kube-system 
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: hubble.local  # Το URL που θα γράφεις στον browser
+  - host: hubble.local  
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: hubble-ui # Το όνομα του service του Hubble
+            name: hubble-ui 
             port:
               number: 80

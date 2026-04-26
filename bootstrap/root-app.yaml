@@ -6,14 +6,14 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/chrisignat/Platform-Engineer.git # <-- Το repo σου!
+    repoURL: https://github.com/chrisignat/Platform-Engineer.git
     targetRevision: main
-    path: infrastructure # <-- ΠΡΟΣΟΧΗ: Κοιτάει μόνο τον φάκελο infra
+    path: infrastructure 
     directory:
-      recurse: true # Αυτό επιτρέπει στο ArgoCD να βρει όλες τις child εφαρμογές μέσα στον φάκελο infra
+      recurse: true 
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd # Οι child εφαρμογές πρέπει να μπαίνουν στο argocd namespace
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true

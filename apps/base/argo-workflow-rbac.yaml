@@ -1,4 +1,3 @@
-# 1. Ορισμός του Role: Τι επιτρέπεται να γίνει στο namespace του ArgoCD
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -9,7 +8,6 @@ rules:
   resources: ["applications"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
-# 2. RoleBinding: Σύνδεση του Role με το default ServiceAccount του Argo Workflows
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -24,7 +22,6 @@ roleRef:
   name: argo-application-manager
   apiGroup: rbac.authorization.k8s.io
 ---
-# 3. Επιπλέον δικαιώματα για να μπορεί το Argo να διαχειρίζεται resources στο δικό του namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

@@ -8,6 +8,6 @@ spec:
     app: velero-ui
   ports:
     - protocol: TCP
-      port: 8080         # Αυτό που ζητάει το Ingress
-      targetPort: 3000   # Αυτό που ζητάει το νέο Pod
+      port: 8080         
+      targetPort: 3000   
   type: ClusterIP

@@ -15,14 +15,14 @@ spec:
           registry: docker.io
           repository: bitnami/redis
           tag: latest
-        # --- ΠΡΟΣΘΕΣΕ ΤΑ ΠΑΡΑΚΑΤΩ ---
+        
         master:
           persistence:
             enabled: true
             size: 2Gi
-            storageClass: "standard" # Σε K3d/Docker Desktop βάλε "local-path" αν το "standard" αποτύχει
+            storageClass: "standard"
         replica:
-          replicaCount: 3           # Για High Availability
+          replicaCount: 3           
           persistence:
             enabled: true
             size: 1Gi

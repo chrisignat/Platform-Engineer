@@ -20,7 +20,7 @@ spec:
               - url: http://localhost:3100/loki/api/v1/push
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring # Στο ίδιο namespace με το Grafana
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true

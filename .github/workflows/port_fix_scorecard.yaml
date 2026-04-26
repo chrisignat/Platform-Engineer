@@ -19,7 +19,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Create Custom File
         run: |
-          # Εδώ διαβάζουμε το input που έγραψες στη φόρμα του Port
           echo "${{ github.event.inputs.file_content }}" > portal_note.txt
       - name: Commit and Push
         run: |

@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
   labels:
     grafana_datasource: "1"
-data: # <--- Η διόρθωση είναι εδώ!
+data:
   datasources.yaml: |
     apiVersion: 1
     datasources:

@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: infra-s3-factory
+spec:
+  templates:
+    - name: provision-s3
+      inputs:
+        parameters:
+          - name: bucket_name
+      container:
+        image: hashicorp/terraform:latest
+        command: [sh, -c]
+        args:
+          - |
+            # 1. Καθαρό Provider χωρίς ερωτηματικά
+            cat <<EOF > provider.tf
+            provider "aws" {
+              access_key                  = "test"
+              secret_key                  = "test"
+              region                      = "us-east-1"
+              skip_credentials_validation = true
+              skip_metadata_api_check     = true
+              skip_requesting_account_id  = true
+              s3_use_path_style           = true
+              
+              endpoints { 
+                s3 = "http://localstack.local"
+              }
+            }
+            EOF
+
+            # 2. Main αρχείο που παίρνει το όνομα από το Argo
+            cat <<EOF > main.tf
+            resource "aws_s3_bucket" "dynamic_bucket" {
+              bucket = "{{inputs.parameters.bucket_name}}"
+            }
+            EOF
+
+            terraform init && terraform apply -auto-approve

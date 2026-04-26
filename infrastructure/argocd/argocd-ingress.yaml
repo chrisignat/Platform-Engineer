@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: nginx
-    # Αυτό το annotation επιτρέπει στο Ingress να μιλήσει με το backend του ArgoCD που είναι HTTPS
+   
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   rules:

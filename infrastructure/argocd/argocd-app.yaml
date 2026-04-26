@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/chrisignat/Platform-Engineer.git # <-- Βάλε το link από το δικό σου repo!
-    targetRevision: main # <-- Βεβαιώσου ότι είναι το σωστό branch (main ή master)
-    path: . # <-- Βάζουμε τελεία (.) επειδή το nginx.yaml είναι χύμα στον κεντρικό φάκελο
+    repoURL: https://github.com/chrisignat/Platform-Engineer.git 
+    targetRevision: main 
+    path: . 
   destination:
     server: https://kubernetes.default.svc
     namespace: apps

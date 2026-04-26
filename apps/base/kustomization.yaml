@@ -3,19 +3,15 @@ kind: Kustomization
 
 
 namespace: apps
-# Λέμε στο Kustomize ποια είναι τα βασικά μας αρχεία
+
 resources:
   - nginx.yaml
   - nginx-hpa.yaml
   - developer-rbac.yaml
 
 
-# Εδώ αρχίζει η μαγεία! 
-# Θα προσθέσουμε αυτόματα ένα label σε ΟΛΑ μας τα resources, 
-# χωρίς να πειράξουμε τα αρχικά YAML.
 commonLabels:
   env: production
   managed-by: argocd
 
-# Ας βάλουμε και ένα πρόθεμα (prefix) σε όλα τα ονόματα (pods, services, ingress)
 namePrefix: prod-

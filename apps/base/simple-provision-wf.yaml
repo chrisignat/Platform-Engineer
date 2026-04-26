@@ -1,60 +1,70 @@
 apiVersion: argoproj.io/v1alpha1
-kind: WorkflowTemplate
+kind: Workflow
 metadata:
-  name: dynamic-provision-nginx
-  namespace: argo
+  generateName: golden-path-infrastructure-
 spec:
-  # Χρησιμοποιούμε το default service account που έχει τα RBAC δικαιώματα
-  serviceAccountName: default 
+  entrypoint: main
   arguments:
     parameters:
-    - name: app-name
-      value: "dev-app-1"
+      - name: resource_type
+        value: "s3"
+      - name: resource_name
+        value: "my-developer-bucket"
+      - name: instance_type
+        value: "t2.micro"
 
-  entrypoint: main
   templates:
-  - name: main
-    steps:
-    - - name: create-namespace
-        template: make-ns
-    - - name: deploy-argocd-app
-        template: make-argo-app
+    - name: main
+      steps:
+        - - name: tf-plan
+            template: terraform-action
+            arguments:
+              parameters:
+                - name: command
+                  value: "plan"
+        
+        - - name: approve
+            template: approve-step
 
-  # Template 1: Δημιουργία Namespace
-  - name: make-ns
-    resource:
-      action: apply
-      manifest: |
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: {{workflow.parameters.app-name}}
+        - - name: tf-apply
+            template: terraform-action
+            arguments:
+              parameters:
+                - name: command
+                  value: "apply -auto-approve"
 
-  # Template 2: Δημιουργία ArgoCD Application
-  - name: make-argo-app
-    resource:
-      action: create
-      manifest: |
-        apiVersion: argoproj.io/v1alpha1
-        kind: Application
-        metadata:
-          name: {{workflow.parameters.app-name}}
-          namespace: argocd
-        spec:
-          project: default
-          source:
-            repoURL: https://github.com/chrisignat/Platform-Engineer.git
-            targetRevision: main
-            path: apps/base/manifests
-          destination:
-            server: https://kubernetes.default.svc
-            namespace: {{workflow.parameters.app-name}}
-          syncPolicy:
-            automated:
-              prune: true
-              selfHeal: true
-            syncOptions:
-            - CreateNamespace=false # Το φτιάξαμε ήδη εμείς στο προηγούμενο step
-            - NamespaceAutoPropagation=true
-            - ApplyOutOfSyncOnly=true
-            - RespectIgnoreDifferences=true
+    - name: terraform-action
+      inputs:
+        parameters:
+          - name: command
+      container:
+        image: hashicorp/terraform:latest
+        command: [sh, -c]
+        args:
+          - |
+            
+            cat <<EOF > provider.tf
+            provider "aws" {
+              access_key                  = "test"
+              secret_key                  = "test"
+              region                      = "us-east-1"
+              skip_credentials_validation = true
+              skip_metadata_api_check     = true
+              endpoints {
+                s3 = "http://localstack:4566"
+                ec2 = "http://localstack:4566"
+              }
+            }
+            EOF
+
+            if [ "{{workflow.parameters.resource_type}}" = "s3" ]; then
+              echo 'resource "aws_s3_bucket" "b" { bucket = "{{workflow.parameters.resource_name}}" }' > main.tf
+            else
+              echo 'resource "aws_instance" "i" { ami = "ami-000000"; instance_type = "{{workflow.parameters.instance_type}}" }' > main.tf
+            fi
+
+            terraform init
+            terraform {{inputs.parameters.command}}
+
+    - name: approve-step
+      suspend: {} # Αυτό δημιουργεί το "κουμπί" έγκρισης στο UI του Argo

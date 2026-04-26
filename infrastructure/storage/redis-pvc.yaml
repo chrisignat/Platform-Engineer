@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   accessModes:
-    - ReadWriteOnce   # Μόνο ένα Pod μπορεί να γράφει κάθε φορά
+    - ReadWriteOnce   
   resources:
     requests:
-      storage: 1Gi    # Ζητάμε 1 Gigabyte χώρο
+      storage: 1Gi   

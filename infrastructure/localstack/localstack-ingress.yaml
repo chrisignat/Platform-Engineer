@@ -16,10 +16,10 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: localstack-aws # Βεβαιώσου ότι αυτό είναι το όνομα του Service σου
+            name: localstack-aws 
             port:
               number: 4566
-  # Για το S3 (Path-style ή Virtual-host style υποστήριξη)
+
   - host: "*.localstack.local"
     http:
       paths:

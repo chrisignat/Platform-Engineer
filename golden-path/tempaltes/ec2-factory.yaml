@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: infra-ec2-factory
+spec:
+  templates:
+    - name: provision-ec2
+      inputs:
+        parameters:
+          - name: instance_name
+          - name: instance_type
+            value: "t3.micro"
+          - name: volume_size
+            value: "20"
+      container:
+        image: hashicorp/terraform:latest
+        command: [sh, -c]
+        args:
+          - |
+            cat <<EOF > provider.tf
+            provider "aws" {
+              region                      = "us-east-1"
+              access_key                  = "test"
+              secret_key                  = "test"
+              skip_credentials_validation = true
+              skip_metadata_api_check     = true
+              skip_requesting_account_id  = true
+              endpoints { 
+                ec2 = "http://localstack.local:4566"
+                sts = "http://localstack.local:4566"
+              }
+            }
+            EOF
+            cat <<EOF > main.tf
+            resource "aws_instance" "vm" {
+              ami           = "ami-000000"
+              instance_type = "{{inputs.parameters.instance_type}}"
+              root_block_device {
+                volume_size = {{inputs.parameters.volume_size}}
+              }
+              tags = {
+                Name = "{{inputs.parameters.instance_name}}"
+              }
+            }
+            EOF
+            terraform init && terraform apply -auto-approve

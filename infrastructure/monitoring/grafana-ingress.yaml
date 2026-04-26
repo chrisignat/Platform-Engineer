@@ -7,13 +7,13 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  - host: grafana.local  # Το URL που θα γράφεις στον browser
+  - host: grafana.local 
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: monitoring-grafana # Πρέπει να είναι το ίδιο με το SVC σου
+            name: monitoring-grafana
             port:
               number: 80

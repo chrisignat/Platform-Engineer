@@ -15,7 +15,6 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
-        # Προσθήκη fsGroup για να έχουν τα volumes τα σωστά permissions
         fsGroup: 101 
       containers:
       - name: nginx
@@ -26,11 +25,11 @@ spec:
           capabilities:
             drop: ["ALL"]
         ports:
-        - containerPort: 8080 # Αλλαγή σε 8080 (Non-privileged port)
+        - containerPort: 8080 
         livenessProbe:
           httpGet:
             path: /
-            port: 8080 # Αλλαγή και εδώ
+            port: 8080 
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
@@ -40,7 +39,6 @@ spec:
           limits:
             cpu: "400m"
             memory: "128Mi"
-        # Εδώ είναι η λύση για το Permission Denied
         volumeMounts:
         - name: cache-volume
           mountPath: /var/cache/nginx
@@ -65,9 +63,9 @@ metadata:
   name: nginx-service
 spec:
   selector:
-    app: nginx # Πρέπει να ταιριάζει με το label του Deployment
+    app: nginx 
   ports:
     - protocol: TCP
-      port: 80         # Η θύρα στην οποία θα ακούει το Service εξωτερικά
-      targetPort: 8080 # Η θύρα που ακούει ο nginx μέσα στο container
-  type: ClusterIP      # Χρησιμοποίησε NodePort ή LoadBalancer αν θες πρόσβαση εκτός cluster
+      port: 80         
+      targetPort: 8080 
+  type: ClusterIP      

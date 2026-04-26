@@ -9,4 +9,4 @@ spec:
     requests.memory: 2Gi
     limits.cpu: "2"
     limits.memory: 4Gi
-    pods: "10" # Μέγιστος αριθμός Pods στο namespace
+    pods: "10"

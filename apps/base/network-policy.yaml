@@ -6,21 +6,21 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: nginx # Εφαρμόζεται στον Nginx
+      app: nginx 
   policyTypes:
   - Egress
   egress:
   - to:
     - podSelector:
         matchLabels:
-          app.kubernetes.io/name: redis # Επιτρέπει την έξοδο ΜΟΝΟ προς Redis
+          app.kubernetes.io/name: redis 
     ports:
     - protocol: TCP
       port: 6379
-  - to: # Απαραίτητο για να μπορεί να "βρει" το IP του Redis
+  - to:
     - namespaceSelector: {}
     ports:
     - protocol: UDP
       port: 53
-    - protocol: TCP # Πρόσθεσε και το TCP
+    - protocol: TCP 
       port: 53

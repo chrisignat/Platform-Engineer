@@ -24,11 +24,11 @@ spec:
         grafana:
           enabled: false 
 
-        # Ενεργοποίηση Network Costs
+
         networkCosts:
           enabled: true
 
-        # ServiceMonitor για να "βλέπει" ο Prometheus το Kubecost
+
         serviceMonitor:
           enabled: true
           additionalLabels:

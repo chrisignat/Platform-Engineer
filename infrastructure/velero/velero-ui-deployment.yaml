@@ -16,10 +16,10 @@ spec:
       serviceAccountName: velero-server 
       containers:
         - name: velero-ui
-          image: otwld/velero-ui:latest # <--- ΔΙΟΡΘΩΘΗΚΕ: Docker Hub αντί για GHCR
+          image: otwld/velero-ui:latest 
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000       # <--- ΔΙΟΡΘΩΘΗΚΕ: Η σωστή πόρτα της εφαρμογής
+            - containerPort: 3000       
           resources:
             limits:
               cpu: 200m

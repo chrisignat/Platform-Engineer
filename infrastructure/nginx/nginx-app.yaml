@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/chrisignat/Platform-Engineer.git 
     targetRevision: main
-    path: apps/base # Επειδή τα nginx.yaml / kustomization.yaml είναι στον κεντρικό φάκελο
+    path: apps/base 
   destination:
     server: https://kubernetes.default.svc
     namespace: apps/base

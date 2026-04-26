@@ -51,7 +51,7 @@ spec:
               cpu: 100m
               memory: 256Mi
           
-          # --- ΑΥΤΟ ΕΛΕΙΠΕ: Δηλώνουμε ρητά και τα 2 Data Sources ---
+          
           additionalDataSources:
             - name: Prometheus
               type: prometheus

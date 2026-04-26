@@ -42,7 +42,7 @@ spec:
           - name: DOCKER_HOST
             value: unix:///var/run/docker.sock
         
-        # Αυτό βοηθάει αν το liveness probe αποτυγχάνει λόγω καθυστέρησης
+        
         livenessProbe:
           initialDelaySeconds: 60
         readinessProbe:
