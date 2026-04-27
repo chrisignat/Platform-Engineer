@@ -150,5 +150,4 @@ Contributions, ideas, and bug fixes are highly welcome! If you want to help impr
 * **🤖 MLOps/AIOps:** Introduce specialized stacks tailored for MLOps/AIOps workflows.
 * **📦 Cluster Bootstrapping:** Add native support for K3S or Minikube to optimize local resource consumption.
 * **🔀 Migration to Kubernetes Gateway API:** Transition from traditional Ingress to the modern Gateway API.
-* **🔐 Secret Management Integration:** Implement **HashiCorp Vault** integration via **External Secrets Operator (ESO)**.
 * **🚀 Progressive Delivery:** Integrate **Argo Rollouts** for Canary and Blue-Green deployments.
