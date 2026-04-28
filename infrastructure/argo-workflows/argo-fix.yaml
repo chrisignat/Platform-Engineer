@@ -10,7 +10,6 @@ spec:
       - name: argo-server
         args:
         - server
-        - --auth-mode
-        - server
-        - --secure
-        - "false"
+        - --auth-mode=server 
+        - --auth-mode=client 
+        - --secure=false     
