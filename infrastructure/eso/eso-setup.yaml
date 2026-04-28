@@ -12,7 +12,7 @@ spec:
       auth:
         kubernetes:
           mountPath: "kubernetes"
-          role: "velero-role" # Αυτό που έφτιαξες στο Βήμα 1
+          role: "velero-role"
           serviceAccountRef:
             name: "external-secrets"
             namespace: "external-secrets"
@@ -29,11 +29,11 @@ spec:
     name: vault-backend
     kind: ClusterSecretStore
   target:
-    name: velero-repo-credentials # Τέτοιο όνομα περιμένει το Velero
+    name: velero-repo-credentials
   data:
   - secretKey: access_key
     remoteRef:
-      key: velero # Το όνομα που έδωσες στο Vault
+      key: velero 
       property: access_key
   - secretKey: secret_key
     remoteRef:
