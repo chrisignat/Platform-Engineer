@@ -1,20 +1,21 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: argo-server
+  name: argo-workflows-ingress
   namespace: argo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
 spec:
-  template:
-    spec:
-      containers:
-      - name: argo-server
-        args:
-        - server
-        - --auth-mode=server  
-        - --auth-mode=client  
-        - --secure=false      
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 2746
-            scheme: HTTP      
+  rules:
+  - host: workflows.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argo-server
+            port:
+              number: 2746
