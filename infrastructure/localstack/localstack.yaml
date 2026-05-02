@@ -14,17 +14,14 @@ spec:
         image:
           repository: localstack/localstack
           tag: latest
-          pullPolicy: Always
-        
+          pullPolicy: Always        
         persistence:
           enabled: true
           size: 5Gi
-
         kubectl:
           image:
             repository: docker.io/bitnami/kubectl
             tag: latest
-
         extraEnvVars:
           - name: LOCALSTACK_PERSISTENCE_DIR
             value: "/var/lib/localstack"
@@ -36,17 +33,13 @@ spec:
           - name: SERVICES
             value: "s3,sqs,lambda,sns,dynamodb,ec2,iam"
           - name: DOCKER_HOST
-            value: unix:///var/run/docker.sock
-        
-        
+            value: unix:///var/run/docker.sock        
         livenessProbe:
           initialDelaySeconds: 60
         readinessProbe:
           initialDelaySeconds: 60
-
         mountDind:
-          enabled: false
-        
+          enabled: false       
         volumes:
           - name: docker-sock
             hostPath:

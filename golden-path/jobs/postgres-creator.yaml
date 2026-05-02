@@ -1,0 +1,448 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: postgres-pro-platform-
+spec:
+  entrypoint: postgres-provisioning-pipeline
+  
+  hostAliases:
+  - ip: "192.168.1.3"
+    hostnames: ["localstack.local"]
+
+  arguments:
+    parameters:
+    - name: postgres-version
+      value: "15.0"
+    - name: target-namespace
+      value: "postgres-ns"
+
+  templates:
+  - name: postgres-provisioning-pipeline
+    dag:
+      tasks:
+      # 1. Ensure Namespace exists
+      - name: create-namespace
+        template: namespace-manager
+        arguments:
+          parameters: [{name: namespace, value: "{{workflow.parameters.target-namespace}}"}]
+
+      # 2. Generate Random Password & Detailed Scan
+      - name: generate-creds
+        template: credential-gen
+      
+      - name: security-scan
+        template: trivy-detailed-scan
+        arguments:
+          parameters: [{name: version, value: "{{workflow.parameters.postgres-version}}"}]
+
+      # 3. Deploy with the Generated Password
+      - name: deploy-postgresql
+        dependencies: [create-namespace, generate-creds, security-scan]
+        template: postgres-ss-manifest
+        arguments:
+          parameters: 
+          - name: db-password
+            value: "{{tasks.generate-creds.outputs.parameters.db-password}}"
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+      # 4. Fetch the Cilium IP
+      - name: get-postgres-ip
+        dependencies: [deploy-postgresql]
+        template: fetch-pod-ip
+        arguments:
+          parameters:
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+      # 5. Final PDF Report
+      - name: generate-pdf-report
+        dependencies: [get-postgres-ip, security-scan]
+        template: pdf-generator
+        arguments:
+          parameters:
+          - name: scan-data
+            value: "{{tasks.security-scan.outputs.parameters.scan-report}}"
+          - name: db-password
+            value: "{{tasks.generate-creds.outputs.parameters.db-password}}"
+          - name: pod-ip
+            value: "{{tasks.get-postgres-ip.outputs.parameters.pod-ip}}"
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+  # --- Namespace Management ---
+  - name: namespace-manager
+    inputs:
+      parameters: [{name: namespace}]
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: "{{inputs.parameters.namespace}}"
+
+  # --- Credential Generation ---
+  - name: credential-gen
+    container:
+      image: alpine:latest
+      command: ["sh", "-c"]
+      args: ["echo $(tr -dc a-A-z-Z-0-9 < /dev/urandom | head -c 12) > /tmp/pass.txt && cat /tmp/pass.txt"]
+    outputs:
+      parameters:
+      - name: db-password
+        valueFrom: {path: /tmp/pass.txt}
+
+  # --- Detailed Trivy Scan ---
+  - name: trivy-detailed-scan
+    inputs:
+      parameters: [{name: version}]
+    container:
+      image: aquasec/trivy:latest
+      command: ["sh", "-c"]
+      args: 
+        - |
+          # Εγκατάσταση του jq on-the-fly
+          apk add --no-cache jq
+          
+          trivy image --severity CRITICAL --quiet --format json postgres:{{inputs.parameters.version}} | \
+          jq -r '.Results[0].Vulnerabilities[0:15] | .[] | "\(.VulnerabilityID) | \(.PkgName) | \(.InstalledVersion)"' > /tmp/scan.txt && \
+          cat /tmp/scan.txt
+    outputs:
+      parameters:
+      - name: scan-report
+        valueFrom: {path: /tmp/scan.txt}
+
+  # --- Postgres Deployment ---
+  - name: postgres-ss-manifest
+    inputs:
+      parameters: 
+      - name: db-password
+      - name: namespace
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: postgres-{{workflow.name}}
+          namespace: "{{inputs.parameters.namespace}}"
+        spec:
+          serviceName: "postgres"
+          replicas: 1
+          selector:
+            matchLabels:
+              app: postgres
+          template:
+            metadata:
+              labels:
+                app: postgres
+            spec:
+              containers:
+              - name: postgres
+                image: postgres:15.0
+                env:
+                - name: POSTGRES_PASSWORD
+                  value: "{{inputs.parameters.db-password}}"
+
+  # --- Fetch Pod IP (Cilium) ---
+  - name: fetch-pod-ip
+    inputs:
+      parameters: [{name: namespace}]
+    container:
+      image: bitnami/kubectl:latest
+      command: ["sh", "-c"]
+      args:
+        - |
+          kubectl rollout status statefulset/postgres-{{workflow.name}} -n {{inputs.parameters.namespace}} --timeout=300s
+          POD_IP=$(kubectl get pod -n {{inputs.parameters.namespace}} -l app=postgres -o jsonpath='{.items[0].status.podIP}')
+          echo -n $POD_IP > /tmp/pod_ip.txt
+    outputs:
+      parameters:
+      - name: pod-ip
+        valueFrom: {path: /tmp/pod_ip.txt}
+
+  # --- PDF Generator ---
+  - name: pdf-generator
+    inputs:
+      parameters:
+      - name: scan-data
+      - name: db-password
+      - name: pod-ip
+      - name: namespace
+    container:
+      image: python:3.9-slim
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          pip install fpdf2
+          export SCAN_DATA="{{inputs.parameters.scan-data}}"
+          python3 - <<EOF
+          from fpdf import FPDF
+          import os
+
+          clean_scan = os.getenv('SCAN_DATA', 'N/A').encode("ascii", "ignore").decode()
+          
+          pdf = FPDF()
+          pdf.add_page()
+          pdf.set_font("helvetica", 'B', 16)
+          pdf.cell(0, 10, 'Advanced Provisioning & Security Report', align='C', new_x="LMARGIN", new_y="NEXT")
+          pdf.ln(5)
+          
+          pdf.set_font("helvetica", 'B', 12)
+          pdf.cell(0, 10, "Deployment Details:", new_x="LMARGIN", new_y="NEXT")
+          
+          pdf.set_font("helvetica", size=11)
+          pdf.cell(0, 8, f"Namespace: {{inputs.parameters.namespace}}", new_x="LMARGIN", new_y="NEXT")
+          pdf.cell(0, 8, f"Cilium Pod IP: {{inputs.parameters.pod-ip}}", new_x="LMARGIN", new_y="NEXT")
+          
+          pdf.set_text_color(255, 0, 0)
+          pdf.cell(0, 8, f"DATABASE PASSWORD: {{inputs.parameters.db-password}}", new_x="LMARGIN", new_y="NEXT")
+          pdf.set_text_color(0, 0, 0)
+          
+          pdf.ln(5)
+          pdf.set_font("helvetica", 'B', 12)
+          pdf.cell(0, 10, "Critical Vulnerabilities Detail:", new_x="LMARGIN", new_y="NEXT")
+          
+          pdf.set_font("courier", size=9)
+          pdf.multi_cell(0, 6, clean_scan)
+          
+          pdf.output("/tmp/pro-report.pdf")
+          EOF
+    outputs:
+      artifacts:
+      - name: provisioning-pdf
+        path: /tmp/pro-report.pdf
+        archive: {none: {}}apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: postgres-pro-platform-
+spec:
+  entrypoint: postgres-provisioning-pipeline
+  
+  arguments:
+    parameters:
+    - name: postgres-version
+      value: "15.0"
+    - name: target-namespace
+      value: "postgres-prod"
+    - name: cpu-request
+      value: "250m" # 0.25 Core
+    - name: mem-request
+      value: "512Mi"
+
+  templates:
+  - name: postgres-provisioning-pipeline
+    dag:
+      tasks:
+      - name: create-namespace
+        template: namespace-manager
+        arguments:
+          parameters: [{name: namespace, value: "{{workflow.parameters.target-namespace}}"}]
+
+      - name: generate-creds
+        template: credential-gen
+
+      - name: deploy-app
+        dependencies: [create-namespace, generate-creds]
+        template: postgres-deployment-manifest
+        arguments:
+          parameters: 
+          - name: db-password
+            value: "{{tasks.generate-creds.outputs.parameters.db-password}}"
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+      - name: get-service-ip
+        dependencies: [deploy-app]
+        template: fetch-service-ip
+        arguments:
+          parameters:
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+      - name: generate-pdf-report
+        dependencies: [get-service-ip, generate-creds]
+        template: pdf-generator
+        arguments:
+          parameters:
+          - name: db-password
+            value: "{{tasks.generate-creds.outputs.parameters.db-password}}"
+          - name: service-ip
+            value: "{{tasks.get-service-ip.outputs.parameters.svc-ip}}"
+          - name: namespace
+            value: "{{workflow.parameters.target-namespace}}"
+
+  # --- Deployment, Service & HPA ---
+  - name: postgres-deployment-manifest
+    inputs:
+      parameters: [{name: db-password}, {name: namespace}]
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: postgres-deploy
+          namespace: "{{inputs.parameters.namespace}}"
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: postgres
+          template:
+            metadata:
+              labels:
+                app: postgres
+            spec:
+              containers:
+              - name: postgres
+                image: postgres:15.0
+                resources:
+                  requests:
+                    cpu: "{{workflow.parameters.cpu-request}}"
+                    memory: "{{workflow.parameters.mem-request}}"
+                env:
+                - name: POSTGRES_PASSWORD
+                  value: "{{inputs.parameters.db-password}}"
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: postgres-svc
+          namespace: "{{inputs.parameters.namespace}}"
+        spec:
+          selector:
+            app: postgres
+          ports:
+            - protocol: TCP
+              port: 5432
+              targetPort: 5432
+        ---
+        apiVersion: autoscaling/v2
+        kind: HorizontalPodAutoscaler
+        metadata:
+          name: postgres-hpa
+          namespace: "{{inputs.parameters.namespace}}"
+        spec:
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: postgres-deploy
+          minReplicas: 1
+          maxReplicas: 5
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 70
+
+  # --- Fetch Service IP (Αντί για Pod IP) ---
+  - name: fetch-service-ip
+    inputs:
+      parameters: [{name: namespace}]
+    container:
+      image: bitnami/kubectl:latest
+      command: ["sh", "-c"]
+      args:
+        - |
+          SVC_IP=$(kubectl get svc postgres-svc -n {{inputs.parameters.namespace}} -o jsonpath='{.spec.clusterIP}')
+          echo -n $SVC_IP > /tmp/svc_ip.txt
+    outputs:
+      parameters:
+      - name: svc-ip
+        valueFrom: {path: /tmp/svc_ip.txt}
+
+  # --- Enhanced PDF Generator με Kubecost Logic ---
+  - name: pdf-generator
+    inputs:
+      parameters:
+      - name: db-password
+      - name: service-ip
+      - name: namespace
+    container:
+      image: python:3.9-slim
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          pip install fpdf2
+          python3 - <<EOF
+          from fpdf import FPDF
+          
+          # Kubecost-like Calculation (Average Cloud Prices)
+          cpu_req = 0.25  # 250m
+          mem_req = 0.5   # 512Mi
+          cpu_price_per_hr = 0.0316 # Avg price per core
+          mem_price_per_hr = 0.0042 # Avg price per GB
+          
+          monthly_cost = (cpu_req * cpu_price_per_hr + mem_req * mem_price_per_hr) * 24 * 30
+          
+          pdf = FPDF()
+          pdf.add_page()
+          pdf.set_font("helvetica", 'B', 16)
+          pdf.cell(0, 10, 'Production-Ready Provisioning Report', align='C', new_x="LMARGIN", new_y="NEXT")
+          pdf.ln(10)
+          
+          pdf.set_font("helvetica", 'B', 12)
+          pdf.cell(0, 10, "Infrastructure Details:", new_x="LMARGIN", new_y="NEXT")
+          pdf.set_font("helvetica", size=11)
+          pdf.cell(0, 8, f"Namespace: {{inputs.parameters.namespace}}", new_x="LMARGIN", new_y="NEXT")
+          pdf.cell(0, 8, f"Service IP (Stable): {{inputs.parameters.service-ip}}", new_x="LMARGIN", new_y="NEXT")
+          pdf.cell(0, 8, f"HPA Status: Enabled (1-5 Replicas)", new_x="LMARGIN", new_y="NEXT")
+          
+          pdf.ln(5)
+          pdf.set_font("helvetica", 'B', 12)
+          pdf.set_text_color(0, 128, 0) # Green for Cost
+          pdf.cell(0, 10, f"ESTIMATED MONTHLY COST (Kubecost Model): \${monthly_cost:.2f}", new_x="LMARGIN", new_y="NEXT")
+          pdf.set_text_color(0, 0, 0)
+          
+          pdf.ln(5)
+          pdf.set_font("helvetica", 'B', 12)
+          pdf.cell(0, 10, "Credentials:", new_x="LMARGIN", new_y="NEXT")
+          pdf.set_font("courier", size=12)
+          pdf.cell(0, 8, f"Password: {{inputs.parameters.db-password}}", new_x="LMARGIN", new_y="NEXT")
+          
+          pdf.output("/tmp/pro-report.pdf")
+          EOF
+    outputs:
+      artifacts:
+      - name: provisioning-pdf
+        path: /tmp/pro-report.pdf
+        s3:
+          endpoint: localstack.local:4566
+          bucket: velero-backups
+          key: "reports/{{workflow.name}}/pro-report.pdf"
+          insecure: true
+          accessKeySecret: {name: my-s3-credentials, key: accessKey}
+          secretKeySecret: {name: my-s3-credentials, key: secretKey}
+
+  # --- Credentials & Namespace Templates (Same as before) ---
+  - name: credential-gen
+    container:
+      image: alpine:latest
+      command: ["sh", "-c"]
+      args: ["echo $(tr -dc a-A-z-Z-0-9 < /dev/urandom | head -c 12) > /tmp/pass.txt"]
+    outputs:
+      parameters:
+      - name: db-password
+        valueFrom: {path: /tmp/pass.txt}
+
+  - name: namespace-manager
+    inputs:
+      parameters: [{name: namespace}]
+    resource:
+      action: apply
+      manifest: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: "{{inputs.parameters.namespace}}"
+        s3:
+          endpoint: localstack.local
+          bucket: velero-backups
+          key: "reports/{{workflow.name}}/pro-report.pdf"
+          insecure: true
+          accessKeySecret: {name: my-s3-credentials, key: accessKey}
+          secretKeySecret: {name: my-s3-credentials, key: secretKey}

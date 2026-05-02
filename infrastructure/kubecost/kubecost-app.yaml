@@ -14,20 +14,14 @@ spec:
         kubecostProductConfigs:
           clusterName: my-lab-cluster
           prometheusExternalUrl: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
-          prometheusMgmtApiEndpoint: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
-          
+          prometheusMgmtApiEndpoint: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090          
         prometheus:
           enabled: false
-          fqdn: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
-        
+          fqdn: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090       
         grafana:
           enabled: false 
-
-
         networkCosts:
           enabled: true
-
-
         serviceMonitor:
           enabled: true
           additionalLabels:

@@ -1,0 +1,32 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: postgres-provisioner-limited-role
+rules:
+  # Επιτρέπει τη διαχείριση του Namespace (για το create-namespace task)
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "create", "patch", "watch"]
+
+  # Επιτρέπει τη διαχείριση των Pods (για το fetch-pod-ip task)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+  # Επιτρέπει τη διαχείριση του StatefulSet (για το deploy-postgresql task)
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "create", "patch", "watch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-limited-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: postgres-provisioner-limited-role
+  apiGroup: rbac.authorization.k8s.io

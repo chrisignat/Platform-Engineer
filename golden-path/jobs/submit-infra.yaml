@@ -10,7 +10,6 @@ spec:
         value: "s3" 
       - name: name
         value: "my-resource-name"
-
   templates:
     - name: main
       dag:
@@ -26,8 +25,6 @@ spec:
                   value: "{{workflow.parameters.name}}"
                 - name: versioning
                   value: "Enabled"
-
-
           - name: deploy-ec2
             when: "{{workflow.parameters.target_resource}} == ec2"
             templateRef:

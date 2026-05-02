@@ -12,7 +12,6 @@ spec:
         value: "my-developer-bucket"
       - name: instance_type
         value: "t2.micro"
-
   templates:
     - name: main
       steps:
@@ -32,7 +31,6 @@ spec:
               parameters:
                 - name: command
                   value: "apply -auto-approve"
-
     - name: terraform-action
       inputs:
         parameters:

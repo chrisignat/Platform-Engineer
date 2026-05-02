@@ -14,8 +14,7 @@ spec:
         image:
           registry: docker.io
           repository: bitnami/redis
-          tag: latest
-        
+          tag: latest        
         master:
           persistence:
             enabled: true

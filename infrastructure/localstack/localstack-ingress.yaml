@@ -18,7 +18,6 @@ spec:
             name: localstack-aws 
             port:
               number: 4566
-
   - host: "*.localstack.local"
     http:
       paths:

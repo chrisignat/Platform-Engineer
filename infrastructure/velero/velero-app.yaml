@@ -12,8 +12,7 @@ spec:
     helm:
       values: |
         upgradeCRDs: false
-        cleanUpCRDs: false
-        
+        cleanUpCRDs: false        
         configuration:
           backupStorageLocation:
             - name: default
@@ -27,15 +26,13 @@ spec:
             - name: default
               provider: aws
               config:
-                region: us-east-1
-        
+                region: us-east-1        
         initContainers:
           - name: velero-plugin-for-aws
             image: velero/velero-plugin-for-aws:v1.9.0
             volumeMounts:
               - mountPath: /target
                 name: plugins
-
         credentials:
           existingSecret: velero-repo-credentials
           useSecret: true
