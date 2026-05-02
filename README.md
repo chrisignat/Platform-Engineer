@@ -63,8 +63,7 @@ This repository is an ongoing project aimed at building a professional **Interna
 * **Kubecost:** Real-time cost visibility and insights for Kubernetes resources.
 * **Resource Efficiency:** Helps identify over-provisioned workloads and optimize the platform's spend.
 
-## 🗄️ Storage & Databases (Redis & PostgreSQL)
-* **PostgreSQL:** Deployed via Helm-based Application with 8Gi persistent storage.
+## 🗄️ Storage & Databases (PostgreSQL)
 * **Redis:** High-availability setup with 3 replicas and persistent storage via PVCs.
 
 ## 🔑 Secrets Management (Vault & ESO)
@@ -81,10 +80,14 @@ This repository is an ongoing project aimed at building a professional **Interna
 
 ### Local Ingress Map (Add to `/etc/hosts`)
 ```text
-127.0.0.1 argocd.local
-127.0.0.1 grafana.local
-127.0.0.1 hubble.local
 127.0.0.1 localstack.local
+127.0.0.1 grafana.local
+127.0.0.1 argocd.local
+127.0.0.1 hubble.local
+127.0.0.1 kubecost.local
+127.0.0.1 velero.local
+127.0.0.1 workflows.local
+127.0.0.1 vault.local
 ```
 
 ## 🛠️ Troubleshooting
