@@ -14,7 +14,7 @@ spec:
         loki:
           enabled: true
           persistence:
-            enabled: false # Για lab περιβάλλον
+            enabled: false
           resources:
             limits:
               cpu: 200m

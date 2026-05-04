@@ -46,7 +46,7 @@ jobs:
           output: 'trivy-config.sarif'
         continue-on-error: true
 
-      # Ανέβασμα όλων των αποτελεσμάτων στο Security Tab του GitHub
+      
       - name: Upload Security Results
         uses: github/codeql-action/upload-sarif@v3
         if: always()

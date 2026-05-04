@@ -19,12 +19,10 @@ spec:
           - "production"
       - name: resource_name
         value: "new-service"
-
   templates:
     - name: main
       dag:
         tasks:
-
           - name: call-s3-factory
             when: "{{workflow.parameters.service_type}} == 'S3 Bucket'"
             templateRef:
@@ -34,8 +32,6 @@ spec:
               parameters:
                 - name: bucket_name
                   value: "{{workflow.parameters.resource_name}}-{{workflow.parameters.environment}}"
-
-
           - name: call-ec2-factory
             when: "{{workflow.parameters.service_type}} == 'EC2 Instance'"
             templateRef:

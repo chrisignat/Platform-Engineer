@@ -4,24 +4,22 @@ metadata:
   generateName: postgres-pro-platform-
 spec:
   entrypoint: postgres-provisioning-pipeline
-  
+
   hostAliases:
   - ip: "192.168.1.3"
     hostnames: ["localstack.local"]
-
   arguments:
     parameters:
     - name: postgres-version
       value: "15.0"
-
   templates:
   - name: postgres-provisioning-pipeline
     dag:
       tasks:
+
       # 1. Generate Random Password & Detailed Scan
       - name: generate-creds
-        template: credential-gen
-      
+        template: credential-gen      
       - name: security-scan
         template: trivy-detailed-scan
         arguments:
@@ -65,7 +63,6 @@ spec:
     container:
       image: aquasec/trivy:latest
       command: [sh, -c]
-      # Παίρνουμε CVE ID, Package και Severity για τις πρώτες 15 ευπάθειες
       args: |
         trivy image --severity CRITICAL --quiet --format json postgres:{{inputs.parameters.version}} | \
         jq -r '.Results[0].Vulnerabilities[0:15] | .[] | "\(.VulnerabilityID) | \(.PkgName) | \(.InstalledVersion)"' > /tmp/scan.txt && \

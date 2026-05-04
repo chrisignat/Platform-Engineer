@@ -15,18 +15,17 @@ spec:
       value: "postgres-prod"
     - name: postgres-version
       value: "15.0"
-
   templates:
   - name: main-pipeline
     dag:
       tasks:
-      # --- ΦΑΣΗ 1: ΑΣΦΑΛΕΙΑ ---
+      # --- Phase1: Security Trivy ---
       - name: security-scan
         template: trivy-scan
         arguments:
           parameters: [{name: version, value: "{{workflow.parameters.postgres-version}}"}]
 
-      # --- ΦΑΣΗ 2: ΠΡΟΕΤΟΙΜΑΣΙΑ (Περιμένει το Scan αλλά προχωράει πάντα) ---
+      # --- Phase2: Preparation (Waits for the Scan but proceeds always) ---
       - name: create-ns
         dependencies: [security-scan]
         template: namespace-manager
@@ -37,7 +36,7 @@ spec:
         dependencies: [security-scan]
         template: credential-gen
 
-      # --- ΦΑΣΗ 3: DEPLOYMENT ---
+      # --- Phase3: DEPLOYMENT ---
       - name: deploy-postgresql
         dependencies: [create-ns, gen-creds]
         template: k8s-deployment
@@ -70,7 +69,7 @@ spec:
         arguments:
           parameters: [{name: namespace, value: "{{workflow.parameters.target-namespace}}"}]
 
-      # --- ΦΑΣΗ 4: ΑΝΑΦΟΡΑ ---
+      # --- Phase4: REPORTING ---
       - name: build-pdf
         dependencies: [get-svc-ip, gen-creds]
         template: pdf-generator

@@ -65,4 +65,4 @@ spec:
             terraform {{inputs.parameters.command}}
 
     - name: approve-step
-      suspend: {} # Αυτό δημιουργεί το "κουμπί" έγκρισης στο UI του Argo
+      suspend: {}

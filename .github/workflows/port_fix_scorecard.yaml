@@ -8,7 +8,7 @@ on:
       port_context:
         description: 'Context from Port'
         required: false
-      file_content: # ΠΡΟΣΘΕΣΕ ΑΥΤΟ ΕΔΩ
+      file_content:
         description: 'The content from Port form'
         required: false
 

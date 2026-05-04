@@ -3,17 +3,17 @@ kind: ClusterRole
 metadata:
   name: postgres-provisioner-limited-role
 rules:
-  # Επιτρέπει τη διαχείριση του Namespace (για το create-namespace task)
+  # Allows for Namespace management (for the create-namespace task)
   - apiGroups: [""]
     resources: ["namespaces"]
     verbs: ["get", "list", "create", "patch", "watch"]
 
-  # Επιτρέπει τη διαχείριση των Pods (για το fetch-pod-ip task)
+  # Allows for Pod management (for the fetch-pod-ip task)
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"]
 
-  # Επιτρέπει τη διαχείριση του StatefulSet (για το deploy-postgresql task)
+  # Allows for StatefulSet management (for the deploy-postgresql task)
   - apiGroups: ["apps"]
     resources: ["statefulsets"]
     verbs: ["get", "list", "create", "patch", "watch", "delete"]

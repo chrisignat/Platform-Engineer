@@ -13,7 +13,6 @@ spec:
         command: [sh, -c]
         args:
           - |
-            # 1. Καθαρό Provider χωρίς ερωτηματικά
             cat <<EOF > provider.tf
             provider "aws" {
               access_key                  = "test"
@@ -30,7 +29,6 @@ spec:
             }
             EOF
 
-            # 2. Main αρχείο που παίρνει το όνομα από το Argo
             cat <<EOF > main.tf
             resource "aws_s3_bucket" "dynamic_bucket" {
               bucket = "{{inputs.parameters.bucket_name}}"
