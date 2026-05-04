@@ -72,7 +72,7 @@ spec:
             default:
               loki-logs:
                 gnetId: 15155
-                revision: 2
+                revision: 1
                 datasource: Loki  
           # ------------------------------------------------------
         kubeControllerManager:
