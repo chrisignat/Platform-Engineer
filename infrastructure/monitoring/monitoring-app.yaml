@@ -58,6 +58,22 @@ spec:
               url: http://loki-stack.monitoring.svc.cluster.local:3100
               access: proxy
               isDefault: false
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+              - name: 'default'
+                orgId: 1
+                folder: 'Logs'
+                type: file
+                options:
+                  path: /var/lib/grafana/dashboards/default
+          dashboards:
+            default:
+              loki-logs:
+                gnetId: 13639
+                revision: 2
+                datasource: Loki  
           # ------------------------------------------------------
         kubeControllerManager:
           enabled: false
