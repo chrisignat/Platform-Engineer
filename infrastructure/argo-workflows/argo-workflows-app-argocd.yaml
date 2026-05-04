@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-workflows-setup
+  namespace: argocd
+spec:
+  project: default
+  source:
+    # Εδώ βάζεις το δικό σου Repo URL
+    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git
+    targetRevision: HEAD
+    path: argo-workflows  # Ο φάκελος που έχει μέσα τα YAML σου
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+    automated:
+      prune: true     # Αν σβήσεις ένα YAML από το Git, θα σβηστεί και από το K8s
+      selfHeal: true  # Αν αλλάξεις κάτι χειροκίνητα στο K8s, το Argo CD θα το επαναφέρει
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
