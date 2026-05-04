@@ -71,7 +71,7 @@ spec:
           dashboards:
             default:
               loki-logs:
-                gnetId: 13639
+                gnetId: 15155
                 revision: 2
                 datasource: Loki  
           # ------------------------------------------------------
