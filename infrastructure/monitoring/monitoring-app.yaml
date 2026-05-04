@@ -57,7 +57,7 @@ spec:
               type: loki
               url: http://loki-stack.monitoring.svc.cluster.local:3100
               access: proxy
-              isDefault: false
+              isDefault: false[cite: 1]
           dashboardProviders:
             dashboardproviders.yaml:
               apiVersion: 1
@@ -73,7 +73,7 @@ spec:
               loki-logs:
                 gnetId: 12019
                 revision: 2
-                datasource: Loki  
+                datasource: Loki[cite: 1] 
                   - inputName: DS_LOKI
                     value: Loki
                 overrides: |
