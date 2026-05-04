@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     # Εδώ βάζεις το δικό σου Repo URL
-    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git
+    repoURL: https://github.com/chrisignat/Platform-Engineer
     targetRevision: HEAD
     path: argo-workflows  # Ο φάκελος που έχει μέσα τα YAML σου
   destination:
