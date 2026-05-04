@@ -74,6 +74,11 @@ spec:
                 gnetId: 12019
                 revision: 2
                 datasource: Loki  
+                  - inputName: DS_LOKI
+                    value: Loki
+                overrides: |
+                  .templating.list[0].query = "label_values(namespace)"
+                  .templating.list[1].query = "label_values({namespace=\"$namespace\"}, pod)"
           # ------------------------------------------------------
         kubeControllerManager:
           enabled: false
