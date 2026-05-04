@@ -71,13 +71,8 @@ spec:
           dashboards:
             default:
               loki-logs:
-<<<<<<< HEAD
                 gnetId: 12019
                 revision: 2
-=======
-                gnetId: 15155
-                revision: 1
->>>>>>> 385385fe98e5d4d21a9f49cad34933ae9b2c8313
                 datasource: Loki  
           # ------------------------------------------------------
         kubeControllerManager:
