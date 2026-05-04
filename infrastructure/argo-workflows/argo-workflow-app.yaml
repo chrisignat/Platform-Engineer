@@ -1,34 +1,73 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: argo-server
-  namespace: argo
-spec:
-  selector:
-    matchLabels:
-      app: argo-server
-  template:
-    metadata:
-      labels:
-        app: argo-server
-    spec:
-      # ΠΡΟΣΘΕΣΕ ΑΥΤΗ ΤΗ ΓΡΑΜΜΗ:
-      serviceAccountName: argo-server
-      containers:
-      - name: argo-server
-        image: quay.io/argoproj/argocli:v3.5.0
-        args:
-        - server
-        - --auth-mode=server
-        - --auth-mode=client
-        # Το secure=true είναι πλέον ενεργό (default) όπως φαίνεται στα logs σου
-        ports:
-        - containerPort: 2746
-          name: https
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 2746
-            scheme: HTTPS
-          initialDelaySeconds: 10
-          periodSeconds: 10
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: argo-server  
+  namespace: argo  
+spec:  
+  selector:  
+    matchLabels:  
+      app: argo-server  
+  template:  
+    metadata:  
+      labels:  
+        app: argo-server  
+    spec:  
+      serviceAccountName: argo-server  
+      containers:  
+      - name: argo-server  
+        image: quay.io/argoproj/argocli:v3.5.0  
+        args:  
+        - server  
+        - --auth-mode=server  
+        - --auth-mode=client  
+        env:  
+        # Ρυθμίσεις για τη σύνδεση με τη βάση δεδομένων  
+        - name: ARGO_DB_TYPE  
+          value: postgres  
+        - name: ARGO_DB_POSTGRES_HOSTNAME  
+          value: postgres  
+        - name: ARGO_DB_POSTGRES_DATABASE  
+          value: postgres  
+        - name: ARGO_DB_POSTGRES_USERNAME  
+          value: postgres  
+        - name: ARGO_DB_POSTGRES_PASSWORD  
+          value: password  
+        ports:  
+        - containerPort: 2746  
+          name: https  
+---  
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: postgres  
+  namespace: argo  
+spec:  
+  selector:  
+    matchLabels:  
+      app: postgres  
+  template:  
+    metadata:  
+      labels:  
+        app: postgres  
+    spec:  
+      containers:  
+      - name: postgres  
+        image: postgres:13  
+        env:  
+        - name: POSTGRES_PASSWORD  
+          value: password  
+        - name: POSTGRES_DB  
+          value: postgres  
+        ports:  
+        - containerPort: 5432  
+---  
+apiVersion: v1  
+kind: Service  
+metadata:  
+  name: postgres  
+  namespace: argo  
+spec:  
+  ports:  
+  - port: 5432  
+  selector:  
+    app: postgres
