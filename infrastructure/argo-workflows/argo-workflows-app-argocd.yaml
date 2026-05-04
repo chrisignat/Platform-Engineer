@@ -6,17 +6,16 @@ metadata:
 spec:
   project: default
   source:
-    # Εδώ βάζεις το δικό σου Repo URL
     repoURL: https://github.com/chrisignat/Platform-Engineer
     targetRevision: HEAD
-    path: argo-workflows  # Ο φάκελος που έχει μέσα τα YAML σου
+    path: infrastructure/argo-workflows 
   destination:
     server: https://kubernetes.default.svc
     namespace: argo
   syncPolicy:
     automated:
-      prune: true     # Αν σβήσεις ένα YAML από το Git, θα σβηστεί και από το K8s
-      selfHeal: true  # Αν αλλάξεις κάτι χειροκίνητα στο K8s, το Argo CD θα το επαναφέρει
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
