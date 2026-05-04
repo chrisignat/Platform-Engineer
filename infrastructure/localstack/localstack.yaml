@@ -18,18 +18,16 @@ spec:
         persistence:
           enabled: true
           size: 5Gi
+          mountPath: /var/lib/localstack
         kubectl:
           image:
             repository: docker.io/bitnami/kubectl
             tag: latest
         extraEnvVars:
+          - name: PERSISTENCE
+            value: "1"
           - name: LOCALSTACK_PERSISTENCE_DIR
             value: "/var/lib/localstack"
-          - name: LOCALSTACK_AUTH_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: localstack-secrets
-                key: auth-token
           - name: SERVICES
             value: "s3,sqs,lambda,sns,dynamodb,ec2,iam"
           - name: DOCKER_HOST
