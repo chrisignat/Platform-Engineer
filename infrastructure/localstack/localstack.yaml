@@ -13,7 +13,7 @@ spec:
       values: |
         image:
           repository: localstack/localstack
-          tag: latest
+          tag: community
           pullPolicy: Always        
         persistence:
           enabled: true
@@ -24,8 +24,6 @@ spec:
             repository: docker.io/bitnami/kubectl
             tag: latest
         extraEnvVars:
-          - name: PERSISTENCE
-            value: "1"
           - name: LOCALSTACK_PERSISTENCE_DIR
             value: "/var/lib/localstack"
           - name: SERVICES
@@ -33,9 +31,9 @@ spec:
           - name: DOCKER_HOST
             value: unix:///var/run/docker.sock        
         livenessProbe:
-          initialDelaySeconds: 60
+          initialDelaySeconds: 80
         readinessProbe:
-          initialDelaySeconds: 60
+          initialDelaySeconds: 80
         mountDind:
           enabled: false       
         volumes:
