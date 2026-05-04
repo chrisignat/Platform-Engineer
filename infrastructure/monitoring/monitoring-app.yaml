@@ -34,11 +34,11 @@ spec:
             retention: 168h
             resources:
               limits:
-                cpu: 200m
-                memory: 512Mi
+                cpu: 500m
+                memory: 1024Mi
               requests:
-                cpu: 100m
-                memory: 256Mi
+                cpu: 250m
+                memory: 512Mi
         grafana:
           resources:
             limits:
